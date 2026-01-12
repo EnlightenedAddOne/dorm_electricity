@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>监控修复</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 { color: #333; margin-bottom: 20px; }
+        img {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            background: #f5f5f5;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 3px solid #eee;
+        }
+        .status {
+            font-weight: 600;
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #666;
+        }
+        .hint {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .loader {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🔐 微信扫码登录</h2>
+        <div id="sourceHint" class="hint" style="margin-top:-6px;">正在准备...</div>
+        <img id="qr" src="" alt="等待加载..." style="display:none">
+        <div id="loader" class="loader"></div>
+        <div id="msg" class="status">正在启动安全浏览器...</div>
+        <div class="hint">请保持此页面打开直到提示成功</div>
+        <a href="#" class="back-btn" style="display:none; background:#f59e0b;" id="refreshBtn">手动刷新二维码</a>
+        <a href="/" class="back-btn" style="display:none;" id="backBtn">返回首页</a>
+    </div>
+    <script>
+        const interval = setInterval(() => {
+            fetch('/login-status').then(r => r.json()).then(d => {
+                const img = document.getElementById('qr');
+                const msg = document.getElementById('msg');
+                const loader = document.getElementById('loader');
+                const backBtn = document.getElementById('backBtn');
+                const refreshBtn = document.getElementById('refreshBtn');
+                const sourceHint = document.getElementById('sourceHint');
+
+                // 显示当前 source（后端会回传）
+                const src = (d.source || '').trim();
+                if (src) {
+                    const map = { 'ac_a': 'A宿舍(空调)', 'ac_b': 'B宿舍(空调)', 'k': 'K宿舍(照明)' };
+                    sourceHint.innerText = '当前账号：' + (map[src] || src);
+                } else {
+                    sourceHint.innerText = '当前账号：未指定（默认）';
+                }
+
+                if (d.status === 'success') {
+                    clearInterval(interval);
+                    loader.style.display = 'none';
+                    document.querySelector('.card').innerHTML = `
+                        <h2 style="color: #10b981;">✅ 登录成功</h2>
+                        <p style="margin: 10px 0; color: #666;">Cookie已更新,监控服务已恢复</p>
+                        <p style="margin: 0 0 20px; color: #999; font-size: 0.9em;">${sourceHint ? sourceHint.innerText : ''}</p>
+                        <a href="/" class="back-btn">返回首页</a>
+                    `;
+                } else if (d.status === 'timeout') {
+                    clearInterval(interval);
+                    loader.style.display = 'none';
+                    msg.innerText = "❌ 操作超时";
+                    msg.style.color = "#ef4444";
+                    refreshBtn.style.display = 'inline-block';
+                    backBtn.style.display = 'inline-block';
+                } else if (d.img) {
+                    img.src = 'data:image/png;base64,' + d.img;
+                    img.style.display = 'inline-block';
+                    loader.style.display = 'none';
+                    msg.innerText = "请使用微信扫一扫";
+                    msg.style.color = "#333";
+
+                    // 提供手动刷新入口：需要换码时点击即可
+                    refreshBtn.style.display = 'inline-block';
+                } else if (d.status === 'processing') {
+                    msg.innerText = "正在加载登录页面...";
+                }
+
+                // 刷新按钮：保持 source 一致，强制重启扫码流程
+                refreshBtn.onclick = (ev) => {
+                    ev.preventDefault();
+                    const src = (d.source || '').trim();
+                    const url = src ? `/login?source=${encodeURIComponent(src)}&force=1` : '/login?force=1';
+                    window.location.href = url;
+                };
+            });
+        }, 1500);
+    </script>
+</body>
+</html>

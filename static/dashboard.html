@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿舍电费监控 - 管理面板</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        .mobile-nav { display: none; }
+        @media (max-width: 768px) {
+            .desktop-nav { display: none; }
+            .mobile-nav { display: flex; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans" x-data="dashboard()" x-init="init()">
+    
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-gray-100 desktop-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg mr-3 shadow-blue-200 shadow-md">
+                        <i class="fas fa-bolt text-lg"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">宿舍电费监控</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="hidden sm:flex items-center bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                        <i class="far fa-clock text-indigo-400 text-xs mr-2"></i>
+                        <span class="text-xs font-mono font-bold text-indigo-600 tracking-wide" x-text="currentTime"></span>
+                    </div>
+                    
+                    <button @click="showTab = 'dashboard'"  
+                            :class="showTab === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+                            class="px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm">
+                        <i class="fas fa-home mr-2"></i>仪表盘
+                    </button>
+                    
+                    <button x-show="isAdmin"
+                            @click="loadConfig(); showTab = 'config'" 
+                            :class="showTab === 'config' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
+                            class="px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm">
+                        <i class="fas fa-cog mr-2"></i>配置
+                    </button>
+
+                    <a href="/help" class="text-gray-600 hover:bg-gray-100 px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm">
+                        <i class="fas fa-question-circle mr-2"></i>帮助
+                    </a>
+                    
+                    <button @click="isAdmin ? logout() : showAdminLogin = true" 
+                            class="ml-2 w-10 h-10 flex items-center justify-center rounded-xl transition duration-200 shadow-sm border"
+                            :class="isAdmin ? 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50 hover:text-blue-500'"
+                            :title="isAdmin ? '退出管理员' : '管理员登录'">
+                        <i class="fas" :class="isAdmin ? 'fa-user-shield' : 'fa-user-cog'"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="bg-white/90 backdrop-blur shadow-lg mobile-nav flex-col border-b border-gray-100">
+        <div class="flex justify-between items-center px-4 py-3">
+            <div class="flex items-center">
+                <div class="bg-blue-600 text-white p-1.5 rounded-lg mr-2">
+                    <i class="fas fa-bolt text-sm"></i>
+                </div>
+                <h1 class="text-lg font-bold text-gray-800">电费监控</h1>
+            </div>
+            <div class="flex items-center">
+                <button @click="isAdmin ? logout() : showAdminLogin = true" 
+                    class="mr-3 w-8 h-8 rounded-lg flex items-center justify-center border transition-colors"
+                    :class="isAdmin ? 'bg-green-50 text-green-600 border-green-200' : 'bg-white text-gray-400 border-gray-100'">
+                    <i class="fas" :class="isAdmin ? 'fa-user-shield' : 'fa-user-cog text-xs'"></i>
+                </button>
+                <div class="flex items-center bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">
+                    <span class="text-[10px] font-mono font-bold text-indigo-600 tracking-wide" x-text="currentTime"></span>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-around border-t border-gray-100 py-2">
+            <button @click="showTab = 'dashboard'" 
+                    :class="showTab === 'dashboard' ? 'text-blue-600 bg-blue-50' : 'text-gray-400'"
+                    class="flex flex-col items-center flex-1 py-1 rounded-lg mx-2 transition-colors">
+                <i class="fas fa-home text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">仪表盘</span>
+            </button>
+            
+            <button x-show="isAdmin"
+                    @click="loadConfig(); showTab = 'config'" 
+                    :class="showTab === 'config' ? 'text-blue-600 bg-blue-50' : 'text-gray-400'"
+                    class="flex flex-col items-center flex-1 py-1 rounded-lg mx-2 transition-colors">
+                <i class="fas fa-cog text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">配置</span>
+            </button>
+
+            <a href="/help" class="flex flex-col items-center flex-1 py-1 rounded-lg mx-2 text-gray-400">
+                <i class="fas fa-question-circle text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">帮助</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        
+        <div x-show="showTab === 'dashboard'" x-cloak>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <!-- 登录状态卡片 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6 transition hover:shadow-md">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">登录状态</p>
+                            <h3 class="text-xl sm:text-2xl font-bold" :class="getLoginSummaryTextClass()">
+                                <span x-text="getLoginSummaryText()"></span>
+                            </h3>
+                        </div>
+                        <div :class="getLoginSummaryIconClass()" 
+                             class="rounded-xl p-3 shadow-inner">
+                            <i class="fas fa-key text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <a :href="isAuthSourceConnected('ac_a') ? '/login?source=ac_a&force=1' : '/login?source=ac_a'" target="_blank"
+                               @click="if (isAuthSourceConnected('ac_a') && !confirm('A宿舍当前显示已连接。确定要重新扫码覆盖登录吗？')) { $event.preventDefault(); }"
+                               :aria-disabled="'false'"
+                               :title="isAuthSourceConnected('ac_a') ? 'A宿舍已连接：点击可重新扫码(覆盖)' : '点击打开二维码登录'"
+                               class="block w-full text-center px-3 py-2.5 rounded-xl transition text-sm font-medium"
+                               :class="isAuthSourceConnected('ac_a')
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-200 shadow-lg'">
+                                <i class="fas mr-2" :class="isAuthSourceConnected('ac_a') ? 'fa-check-circle' : 'fa-qrcode'"></i>
+                                <span x-text="isAuthSourceConnected('ac_a') ? 'A宿舍(空调)' : 'A宿舍(空调)'"></span>
+                            </a>
+                            <a :href="isAuthSourceConnected('ac_b') ? '/login?source=ac_b&force=1' : '/login?source=ac_b'" target="_blank"
+                               @click="if (isAuthSourceConnected('ac_b') && !confirm('B宿舍当前显示已连接。确定要重新扫码覆盖登录吗？')) { $event.preventDefault(); }"
+                               :aria-disabled="'false'"
+                               :title="isAuthSourceConnected('ac_b') ? 'B宿舍已连接：点击可重新扫码(覆盖)' : '点击打开二维码登录'"
+                               class="block w-full text-center px-3 py-2.5 rounded-xl transition text-sm font-medium"
+                               :class="isAuthSourceConnected('ac_b')
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-200 shadow-lg'">
+                                <i class="fas mr-2" :class="isAuthSourceConnected('ac_b') ? 'fa-check-circle' : 'fa-qrcode'"></i>
+                                <span x-text="isAuthSourceConnected('ac_b') ? 'B宿舍(空调)' : 'B宿舍(空调)'"></span>
+                            </a>
+                            <a :href="isAuthSourceConnected('k') ? '/login?source=k&force=1' : '/login?source=k'" target="_blank"
+                               @click="if (isAuthSourceConnected('k') && !confirm('K宿舍当前显示已连接。确定要重新扫码覆盖登录吗？')) { $event.preventDefault(); }"
+                               :aria-disabled="'false'"
+                               :title="isAuthSourceConnected('k') ? 'K宿舍已连接：点击可重新扫码(覆盖)' : '点击打开二维码登录'"
+                               class="block w-full text-center px-3 py-2.5 rounded-xl transition text-sm font-medium"
+                               :class="isAuthSourceConnected('k')
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-200 shadow-lg'">
+                                <i class="fas mr-2" :class="isAuthSourceConnected('k') ? 'fa-check-circle' : 'fa-qrcode'"></i>
+                                <span x-text="isAuthSourceConnected('k') ? 'K宿舍(照明)' : 'K宿舍(照明)'"></span>
+                            </a>
+                        </div>
+                        <button @click="showManualCookie = true" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-keyboard mr-2"></i>手动输入
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 监控状态卡片 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6 transition hover:shadow-md relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">监控服务</p>
+                            <h3 class="text-xl sm:text-2xl font-bold flex items-center gap-2" :class="status.is_monitoring ? 'text-emerald-600' : 'text-slate-500'">
+                                <span class="relative flex h-3 w-3" x-show="status.is_monitoring">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                                </span>
+                                <span x-text="status.is_monitoring ? '运行中' : '已暂停'"></span>
+                            </h3>
+                        </div>
+                        <div class="bg-indigo-50 text-indigo-500 rounded-xl p-3">
+                            <i class="fas fa-heartbeat text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-slate-50 rounded-lg p-3 border border-slate-100">
+                         <div class="flex items-center justify-between text-sm">
+                             <span class="text-slate-500"><i class="fas fa-history mr-1"></i>检测间隔</span>
+                             <span class="font-mono font-medium text-slate-700" x-text="Math.floor(status.interval / 60) + ' min'"></span>
+                         </div>
+                    </div>
+                    
+                    <div x-show="isAdmin" class="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+                         <button @click="toggleMonitoring()" 
+                                 class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 px-3 py-1.5 rounded-lg transition">
+                             <i class="fas mr-1.5" :class="status.is_monitoring ? 'fa-pause' : 'fa-play'"></i>
+                             <span x-text="status.is_monitoring ? '暂停监控' : '恢复监控'"></span>
+                         </button>
+                    </div>
+                </div>
+
+                <!-- 上次检测卡片 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6 sm:col-span-2 lg:col-span-1 transition hover:shadow-md">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex-1">
+                            <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">最近更新</p>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800">
+                                <span x-text="status.last_check_time || '尚未开始'"></span>
+                            </h3>
+                        </div>
+                        <div class="bg-orange-50 text-orange-500 rounded-xl p-3">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                         <div class="flex items-center justify-between text-sm bg-slate-50 p-2.5 rounded-lg">
+                             <span class="text-slate-500">下一次运行</span>
+                             <span class="font-mono font-bold text-blue-600" x-text="Math.floor(status.next_check_in / 60) + ' min'"></span>
+                         </div>
+                         <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                             <div class="h-full bg-blue-500 rounded-full animate-pulse" style="width: 60%"></div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div x-show="status.last_error" class="bg-rose-50 border-l-4 border-rose-500 p-4 mb-6 rounded-r-lg shadow-sm animate-pulse-once">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-rose-500 mt-0.5 text-lg"></i>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <h3 class="text-sm font-medium text-rose-800">系统遇到问题</h3>
+                        <div class="mt-1 text-sm text-rose-700" x-text="status.last_error"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <template x-for="room in status.rooms" :key="room.room">
+                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:-translate-y-1 overflow-hidden group">
+                        <div class="px-5 pt-5 pb-3 border-b border-gray-50 flex justify-between items-center bg-gradient-to-r from-white to-slate-50">
+                            <h3 class="text-lg font-bold text-slate-700 flex items-center">
+                                <i class="fas fa-door-closed text-slate-400 mr-2"></i>
+                                <span x-text="room.room"></span>
+                            </h3>
+                            <button class="text-slate-300 hover:text-blue-500 transition">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                        <div class="p-5">
+                            <div class="mb-4">
+                                <p class="text-sm text-slate-500 mb-1 flex items-center">
+                                     <i class="fas fa-bolt text-yellow-500 mr-1.5"></i>剩余电量
+                                </p>
+                                <div class="flex items-baseline">
+                                     <span class="text-4xl font-bold tracking-tight" 
+                                      :class="parseFloat(room.kwh) < config.threshold ? 'text-rose-500' : 'text-slate-800'"
+                                      x-text="room.kwh"></span>
+                                     <span class="ml-1 text-slate-500 text-sm font-medium">度</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-50 rounded-xl p-3 flex items-center justify-between border border-slate-100 group-hover:border-blue-100 transition-colors">
+                                <div class="flex items-center text-sm text-slate-600">
+                                    <i class="fas fa-coins text-yellow-500 mr-2"></i>
+                                    <span>账户余额</span>
+                                </div>
+                                <span class="text-lg font-semibold text-slate-700 font-mono" x-text="room.money + ' 元'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                 <div x-show="!status.rooms || status.rooms.length === 0" 
+                     class="col-span-full bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 p-10 text-center hover:bg-slate-100 transition cursor-pointer">
+                    <div class="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                        <i class="fas fa-plug text-slate-300 text-4xl"></i>
+                    </div>
+                    <p class="text-slate-600 text-lg font-medium">暂无房间数据</p>
+                    <p class="text-slate-400 text-sm mt-2 max-w-md mx-auto">系统将会自动同步已绑定宿舍的电量数据，请确保Cookie状态正常。</p>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="showTab === 'config'" x-cloak>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-10 max-w-3xl mx-auto">
+                <div class="flex items-center space-x-3 border-b border-gray-100 pb-6 mb-6">
+                    <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                        <i class="fas fa-sliders-h text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">系统设置</h2>
+                        <p class="text-slate-500 text-sm">调整监控频率、阈值与通知选项</p>
+                    </div>
+                </div>
+
+                <form @submit.prevent="saveConfig()" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">检测间隔 (秒)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-400"><i class="far fa-clock"></i></span>
+                                <input type="number" x-model="config.interval" min="60" step="60"
+                                    class="w-full pl-10 px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 focus:bg-white text-slate-700">
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">建议设置 900 秒 (15分钟) 以上</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">低电量阈值 (度)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-400"><i class="fas fa-bolt"></i></span>
+                                <input type="number" x-model="config.threshold" min="0" step="0.1"
+                                    class="w-full pl-10 px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 focus:bg-white text-slate-700">
+                            </div>
+                             <p class="text-xs text-gray-400 mt-1">低于此值将触发邮件报警</p>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">低电量告警冷却时间 (秒)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-400"><i class="fas fa-hourglass-half"></i></span>
+                                <input type="number" x-model="config.cooldown_seconds" min="0" step="60"
+                                    class="w-full pl-10 px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 focus:bg-white text-slate-700">
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">同一房间在冷却期内只发一次；设为 0 表示不限制（不建议）</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">邮件收件人</label>
+                        <div class="w-full border border-gray-200 rounded-xl bg-slate-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition">
+                            <div class="flex flex-wrap gap-2 p-3">
+                                <template x-for="(mail, idx) in recipientsList" :key="mail">
+                                    <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs border border-blue-200">
+                                        <i class="far fa-envelope"></i>
+                                        <span x-text="mail"></span>
+                                        <button type="button" class="ml-1 text-blue-500 hover:text-blue-700" @click="removeRecipient(idx)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </span>
+                                </template>
+                                <input type="email"
+                                       x-model.trim="recipientInput"
+                                       @keydown.enter.prevent="addRecipient()"
+                                       placeholder="输入邮箱后回车添加"
+                                       class="flex-1 min-w-[180px] bg-transparent px-2 py-1.5 outline-none text-sm text-slate-700 placeholder:text-slate-400"/>
+                                <button type="button" @click="addRecipient()"
+                                        class="text-xs bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-2.5 py-1.5 rounded-lg transition">
+                                    添加
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">将逐个添加邮箱；保存时会同步到配置。</p>
+                    </div>
+
+                    <div class="pt-2">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-slate-700">宿舍/房间 → 收件人映射</label>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">基于当前已抓到的房间列表和“邮件收件人”列表进行选择，支持多对多。用于“低电量告警”和“对应宿舍 Cookie 失效修复”定向通知。</p>
+
+                        <div x-show="recipientsList.length === 0" class="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-4">
+                            请先在上方“邮件收件人”里添加至少一个邮箱，然后再配置房间映射。
+                        </div>
+
+                        <div x-show="recipientsList.length > 0" class="space-y-4">
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-sm font-semibold text-slate-700">当前检测到的房间</div>
+                                    <button type="button" @click="loadStatus()" class="text-xs text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-sync-alt mr-1"></i>刷新房间列表
+                                    </button>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <template x-for="roomName in availableRooms()" :key="roomName">
+                                        <div class="bg-white border border-gray-200 rounded-xl p-3" x-init="roomRecipientMap[roomName] = roomRecipientMap[roomName] || []">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div class="text-sm font-medium text-slate-700" x-text="roomName"></div>
+                                                <div class="text-xs text-slate-400" x-text="getRoomRecipientCount(roomName) + ' 个收件人'"></div>
+                                            </div>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                                <template x-for="mail in recipientsList" :key="mail">
+                                                    <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                                                        <input type="checkbox" class="accent-blue-600"
+                                                               :checked="isRecipientSelected(roomName, mail)"
+                                                               @change="toggleRoomRecipient(roomName, mail, $event.target.checked)">
+                                                        <span class="text-slate-700" x-text="mail"></span>
+                                                    </label>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <div x-show="availableRooms().length === 0" class="text-sm text-slate-400 bg-white border border-dashed border-slate-300 rounded-xl p-4">
+                                        当前没有房间数据。请先确保 Cookie 正常并等待系统抓取成功。
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div x-show="unknownMappedRooms().length > 0" class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                                <div class="text-sm font-semibold text-amber-800 mb-2">已保存但当前未检测到的房间</div>
+                                <div class="space-y-3">
+                                    <template x-for="roomName in unknownMappedRooms()" :key="roomName">
+                                        <div class="bg-white border border-amber-200 rounded-xl p-3" x-init="roomRecipientMap[roomName] = roomRecipientMap[roomName] || []">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div class="text-sm font-medium text-slate-700" x-text="roomName"></div>
+                                                <div class="text-xs text-slate-400" x-text="getRoomRecipientCount(roomName) + ' 个收件人'"></div>
+                                            </div>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                                <template x-for="mail in recipientsList" :key="mail">
+                                                    <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                                                        <input type="checkbox" class="accent-blue-600"
+                                                               :checked="isRecipientSelected(roomName, mail)"
+                                                               @change="toggleRoomRecipient(roomName, mail, $event.target.checked)">
+                                                        <span class="text-slate-700" x-text="mail"></span>
+                                                    </label>
+                                                </template>
+                                            </div>
+                                            <p class="text-xs text-amber-700 mt-2">提示：该房间当前未出现在仪表盘数据中，但映射仍会被保留。</p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">服务器IP (用于链接)</label>
+                        <div class="relative">
+                             <span class="absolute left-3 top-2.5 text-gray-400"><i class="fas fa-network-wired"></i></span>
+                             <input type="text" x-model="config.server_ip" 
+                                   class="w-full pl-10 px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 focus:bg-white text-slate-700">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-100">
+                        <button type="button" @click="openTestEmailModal()"
+                                class="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded-xl transition font-medium flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2 text-gray-400"></i>测试邮件
+                        </button>
+                        <button type="submit"
+                                class="flex-[2] bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition font-medium shadow-lg shadow-blue-200 flex items-center justify-center">
+                            <i class="fas fa-save mr-2"></i>保存配置
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showAdminLogin" 
+         x-cloak
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+         @click.self="showAdminLogin = false">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 class="text-xl font-bold mb-4 text-center">🔐 管理员登录</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Access Token</label>
+                    <input type="password" x-model="adminInputToken"
+                           @keyup.enter="loginAdmin()"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+                <button @click="loginAdmin()"
+                        class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition font-medium">
+                    验证
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showSetup" 
+         x-cloak
+         class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div class="text-center mb-6">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-blue-500 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">系统初始化</h3>
+                <p class="text-gray-600 mt-2">为了安全，请设置一个管理员Token</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">设置新 Token</label>
+                    <input type="text" x-model="newAdminToken"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center font-mono text-lg"
+                           placeholder="建议使用复杂字符串">
+                    <p class="text-xs text-gray-500 mt-2 text-center">请务必牢记，此Token保存在 config.ini 中</p>
+                </div>
+                <button @click="setupAdmin()"
+                        :disabled="!newAdminToken || newAdminToken.length < 6"
+                        class="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white px-4 py-3 rounded-lg transition font-bold shadow-lg">
+                    完成设置并进入
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showManualCookie" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showManualCookie = false">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-bold mb-4">手动输入Cookie</h3>
+            <label class="block text-sm text-slate-600 mb-2">选择账号</label>
+            <select x-model="manualCookie.source" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4">
+                <option value="ac_a">A宿舍账号 (ac_a)</option>
+                <option value="ac_b">B宿舍账号 (ac_b)</option>
+                <option value="k">K宿舍账号 (k)</option>
+            </select>
+            <input type="text" x-model="manualCookie.cookie" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4" placeholder="JSESSIONID=...">
+            <button @click="submitManualCookie()" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg">保存</button>
+        </div>
+    </div>
+
+    <!-- 测试邮件目标选择 Modal -->
+    <div x-show="showTestEmailModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showTestEmailModal = false">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-bold mb-4">发送测试邮件</h3>
+            <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                    <label class="inline-flex items-center gap-2 text-sm">
+                        <input type="radio" class="accent-blue-600" value="select" x-model="testEmailMode">
+                        <span>从收件人列表选择</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm">
+                        <input type="radio" class="accent-blue-600" value="custom" x-model="testEmailMode">
+                        <span>自定义邮箱</span>
+                    </label>
+                </div>
+                <div x-show="testEmailMode === 'select'" class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm text-slate-600">选择收件人（可多选）</label>
+                        <div class="flex gap-2">
+                            <button type="button"
+                                    @click="selectedRecipients = recipientsList.slice()"
+                                    class="text-xs bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-2.5 py-1.5 rounded-lg transition">
+                                全选
+                            </button>
+                            <button type="button"
+                                    @click="selectedRecipients = []"
+                                    class="text-xs bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-2.5 py-1.5 rounded-lg transition">
+                                清空
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="w-full border border-gray-200 rounded-xl bg-slate-50 p-3 max-h-56 overflow-auto">
+                        <div class="space-y-2">
+                            <template x-for="mail in recipientsList" :key="mail">
+                                <label class="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
+                                    <input type="checkbox" class="accent-blue-600" :value="mail" x-model="selectedRecipients">
+                                    <span class="text-sm text-slate-700" x-text="mail"></span>
+                                </label>
+                            </template>
+                        </div>
+                        <p x-show="recipientsList.length === 0" class="text-xs text-rose-500">当前列表为空，请先添加收件人。</p>
+                    </div>
+
+                    <p class="text-xs text-gray-400">已选择 <span class="font-mono" x-text="selectedRecipients.length"></span> 个</p>
+                </div>
+                <div x-show="testEmailMode === 'custom'" class="space-y-2">
+                    <label class="block text-sm text-slate-600">邮箱地址</label>
+                    <input type="email" x-model.trim="customRecipientEmail" placeholder="someone@example.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button @click="showTestEmailModal = false" type="button" class="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm">取消</button>
+                    <button @click="sendTestEmail()" type="button" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">发送</button>
+                </div>
+                <p class="text-xs text-gray-400">提示：可选择一个或多个邮箱发送测试邮件。</p>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="toast.show" x-transition class="fixed bottom-8 right-8 text-white px-6 py-4 rounded-lg shadow-lg z-50" :class="toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'">
+        <span x-text="toast.message"></span>
+    </div>
+
+    <script>
+        function dashboard() {
+            return {
+                showTab: 'dashboard', 
+                showManualCookie: false,
+                showAdminLogin: false,
+                showSetup: false,
+                showTestEmailModal: false,
+                isAdmin: false,
+                adminInputToken: '',
+                newAdminToken: '',
+                currentTime: '',
+                
+                status: { is_monitoring: true, has_cookie: false, last_check_time: null, rooms: [], interval: 900, auth_sources: [], auth_configured: [] },
+                // 预填一些配置数据以便预览
+                config: { 
+                    interval: 1800, 
+                    threshold: 20, 
+                    cooldown_seconds: 21600,
+                    recipients: 'user@example.com, admin@test.com', 
+                    smtp_server: '', 
+                    server_ip: '192.168.3.10' 
+                },
+                // 房间映射：room -> recipients[]（多对多）
+                roomRecipientMap: {},
+                    // 收件人管理（前端增强）
+                    recipientsList: [],
+                    recipientInput: '',
+                    // 测试邮件
+                    selectedRecipients: [],
+                    customRecipientEmail: '',
+                    testEmailMode: 'select', // 'select' | 'custom'
+                manualCookie: { source: 'ac_a', cookie: '', ua: '' },
+                toast: { show: false, message: '', type: 'success' },
+
+                init() {
+                    this.updateTime();
+                    setInterval(() => this.updateTime(), 1000);
+                    
+                    // 1. 检查是否需要初始化
+                    this.checkSystemSetup();
+                    
+                    // 2. 尝试自动登录
+                    this.tryAutoLogin();
+                    
+                    // 3. 加载状态
+                    this.loadStatus();
+                    setInterval(() => this.loadStatus(), 5000);
+
+                    // 初始化收件人列表
+                    this.syncRecipientsFromString();
+                    if (this.recipientsList.length > 0) {
+                        this.selectedRecipients = [this.recipientsList[0]];
+                    }
+                },
+
+                getDisplayAuthSources() {
+                    const sources = Array.isArray(this.status.auth_sources) ? this.status.auth_sources : [];
+                    // legacy 单源模式：只显示一个总状态
+                    if (sources.includes('legacy')) return ['legacy'];
+
+                    const base = ['ac_a', 'ac_b', 'k'];
+                    const extras = sources.filter(s => s && !base.includes(s) && s !== 'legacy');
+                    const merged = [...base, ...extras];
+
+                    // 兜底：如果后端没给 sources（旧版本），至少显示 3 个宿舍
+                    return merged.length ? merged : base;
+                },
+
+                getAuthSourceLabel(src) {
+                    const key = (src || '').toString();
+                    const map = {
+                        'ac_a': 'A宿舍(空调)',
+                        'ac_b': 'B宿舍(空调)',
+                        'k': 'K宿舍(照明)',
+                        'lighting': '照明',
+                        'legacy': '单源模式'
+                    };
+                    return map[key] || key;
+                },
+
+                isAuthSourceConnected(src) {
+                    const key = (src || '').toString();
+                    // 优先使用后端提供的 per-source 状态：只有“最近抓取成功且当前无错误”才算已连接
+                    const per = (this.status && this.status.source_status && this.status.source_status[key]) ? this.status.source_status[key] : null;
+                    if (per) {
+                        return !!per.has_cookie && !per.last_error && !!per.last_ok_time;
+                    }
+
+                    // 兼容旧后端：没有 source_status 时只能退回到“是否配置了 cookie”
+                    if (key === 'legacy') return !!this.status.has_cookie;
+                    const configured = Array.isArray(this.status.auth_configured) ? this.status.auth_configured : [];
+                    return configured.includes(key);
+                },
+
+                getLoginConnectedCount() {
+                    const list = this.getDisplayAuthSources();
+                    return list.filter(s => this.isAuthSourceConnected(s)).length;
+                },
+
+                getLoginSummaryText() {
+                    const list = this.getDisplayAuthSources();
+                    const total = list.length;
+                    const connected = this.getLoginConnectedCount();
+                    if (total <= 1 && list[0] === 'legacy') {
+                        return connected ? '已连接' : '未连接';
+                    }
+                    return `已连接 ${connected}/${total}`;
+                },
+
+                getLoginSummaryTextClass() {
+                    const list = this.getDisplayAuthSources();
+                    const total = list.length;
+                    const connected = this.getLoginConnectedCount();
+                    if (connected <= 0) return 'text-rose-600';
+                    if (connected >= total) return 'text-emerald-600';
+                    return 'text-amber-600';
+                },
+
+                getLoginSummaryIconClass() {
+                    const list = this.getDisplayAuthSources();
+                    const total = list.length;
+                    const connected = this.getLoginConnectedCount();
+                    if (connected <= 0) return 'bg-rose-100 text-rose-600';
+                    if (connected >= total) return 'bg-emerald-100 text-emerald-600';
+                    return 'bg-amber-100 text-amber-700';
+                },
+
+                async checkSystemSetup() {
+                    try {
+                        const res = await fetch('/api/admin/check');
+                        const data = await res.json();
+                        if (!data.has_token) {
+                            this.showSetup = true;
+                        }
+                    } catch (e) { console.error(e); }
+                },
+
+                async setupAdmin() {
+                    try {
+                        const res = await fetch('/api/admin/setup', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: this.newAdminToken })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            localStorage.setItem('dorm_admin_token', this.newAdminToken);
+                            this.isAdmin = true;
+                            this.showSetup = false;
+                            this.showToast('初始化成功!', 'success');
+                        } else {
+                            this.showToast(data.message, 'error');
+                        }
+                    } catch (e) { this.showToast('请求失败', 'error'); }
+                },
+
+                async loginAdmin() {
+                    try {
+                        const res = await fetch('/api/admin/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: this.adminInputToken })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            localStorage.setItem('dorm_admin_token', this.adminInputToken);
+                            this.isAdmin = true;
+                            this.showAdminLogin = false;
+                            this.adminInputToken = '';
+                            this.showToast('登录成功', 'success');
+                        } else {
+                            this.showToast(data.message, 'error');
+                        }
+                    } catch (e) { this.showToast('登录失败', 'error'); }
+                },
+
+                logout() {
+                    localStorage.removeItem('dorm_admin_token');
+                    this.isAdmin = false;
+                    this.showTab = 'dashboard';
+                    this.showToast('已退出管理员模式', 'success');
+                },
+
+                async tryAutoLogin() {
+                    const token = localStorage.getItem('dorm_admin_token');
+                    if (token) {
+                        try {
+                            const res = await fetch('/api/admin/login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ token: token })
+                            });
+                            const data = await res.json();
+                            if (data.success) this.isAdmin = true;
+                        } catch (e) { 
+                            localStorage.removeItem('dorm_admin_token');
+                        }
+                    }
+                },
+
+                getAuthHeaders() {
+                    const headers = { 'Content-Type': 'application/json' };
+                    const token = localStorage.getItem('dorm_admin_token');
+                    if (token) headers['X-Admin-Token'] = token;
+                    return headers;
+                },
+
+                updateTime() {
+                    const now = new Date();
+                    this.currentTime = now.toLocaleString('zh-CN', {
+                        month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                    });
+                },
+
+                async loadStatus() {
+                    try {
+                        const resp = await fetch('/api/status');
+                        const data = await resp.json();
+                        if (data.success) this.status = data;
+                    } catch (e) { console.error(e); }
+                },
+
+                async loadConfig() {
+                    if (!this.isAdmin) return;
+                    try {
+                        const resp = await fetch('/api/config', { headers: this.getAuthHeaders() });
+                        if (resp.status === 401) {
+                            this.logout();
+                            return;
+                        }
+                        const data = await resp.json();
+                        if (data.success) {
+                            this.config = data.config;
+                            this.syncRecipientsFromString();
+                            this.selectedRecipients = this.recipientsList.length ? [this.recipientsList[0]] : [];
+
+                            // room_recipients -> roomRecipientMap
+                            this.roomRecipientMap = {};
+                            const rm = (this.config.room_recipients || {});
+                            if (rm && typeof rm === 'object' && !Array.isArray(rm)) {
+                                for (const [room, rec] of Object.entries(rm)) {
+                                    const roomName = (room || '').toString().trim();
+                                    if (!roomName) continue;
+
+                                    let arr = [];
+                                    if (Array.isArray(rec)) {
+                                        arr = rec.map(x => (x || '').toString().trim()).filter(Boolean);
+                                    } else {
+                                        const s = (rec || '').toString().trim();
+                                        arr = s ? s.split(/[;,\n]/).map(x => x.trim()).filter(Boolean) : [];
+                                    }
+                                    this.roomRecipientMap[roomName] = arr;
+                                }
+                            }
+                        }
+                    } catch (e) { console.error(e); }
+                },
+
+                async saveConfig() {
+                    try {
+                        // 将前端维护的列表同步到字符串配置
+                        this.config.recipients = this.recipientsList.join(', ');
+
+                        // roomRecipientMap -> room_recipients（以本次提交为准）
+                        const roomMap = {};
+                        const src = (this.roomRecipientMap || {});
+                        for (const [room, arr] of Object.entries(src)) {
+                            const roomName = (room || '').toString().trim();
+                            if (!roomName) continue;
+                            const list = Array.isArray(arr) ? arr.map(x => (x || '').toString().trim()).filter(Boolean) : [];
+                            if (list.length > 0) roomMap[roomName] = list;
+                        }
+                        this.config.room_recipients = roomMap;
+
+                        const resp = await fetch('/api/config', {
+                            method: 'POST',
+                            headers: this.getAuthHeaders(),
+                            body: JSON.stringify(this.config)
+                        });
+                        const data = await resp.json();
+                        this.showToast(data.message, data.success ? 'success' : 'error');
+                    } catch (e) { this.showToast('保存失败', 'error'); }
+                },
+
+                availableRooms() {
+                    const rooms = (this.status && Array.isArray(this.status.rooms)) ? this.status.rooms : [];
+                    const set = new Set();
+                    for (const r of rooms) {
+                        const name = (r && r.room ? r.room : '').toString().trim();
+                        if (name) set.add(name);
+                    }
+                    return Array.from(set).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+                },
+                unknownMappedRooms() {
+                    const known = new Set(this.availableRooms());
+                    const keys = Object.keys(this.roomRecipientMap || {});
+                    return keys.filter(k => k && !known.has(k)).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+                },
+
+                ensureRoomArray(roomName) {
+                    const key = (roomName || '').toString().trim();
+                    if (!key) return [];
+                    const cur = this.roomRecipientMap[key];
+                    if (!Array.isArray(cur)) {
+                        this.roomRecipientMap[key] = [];
+                    }
+                    return this.roomRecipientMap[key];
+                },
+                isRecipientSelected(roomName, mail) {
+                    const list = this.ensureRoomArray(roomName);
+                    const m = (mail || '').toString().trim();
+                    return m ? list.includes(m) : false;
+                },
+                toggleRoomRecipient(roomName, mail, checked) {
+                    const list = this.ensureRoomArray(roomName);
+                    const m = (mail || '').toString().trim();
+                    if (!m) return;
+                    if (checked) {
+                        if (!list.includes(m)) list.push(m);
+                    } else {
+                        const idx = list.indexOf(m);
+                        if (idx >= 0) list.splice(idx, 1);
+                    }
+                },
+                getRoomRecipientCount(roomName) {
+                    const list = this.ensureRoomArray(roomName);
+                    return Array.isArray(list) ? list.length : 0;
+                },
+
+                async toggleMonitoring() {
+                    try {
+                        const resp = await fetch('/api/toggle-monitoring', {
+                            method: 'POST',
+                            headers: this.getAuthHeaders(),
+                            body: JSON.stringify({ enabled: !this.status.is_monitoring })
+                        });
+                        const data = await resp.json();
+                        if (data.success) this.loadStatus();
+                        this.showToast(data.message, data.success ? 'success' : 'error');
+                    } catch (e) { this.showToast('操作失败', 'error'); }
+                },
+
+                openTestEmailModal() {
+                    if (this.recipientsList.length > 0) {
+                        this.selectedRecipients = [this.recipientsList[0]];
+                        this.testEmailMode = 'select';
+                    } else {
+                        this.testEmailMode = 'custom';
+                    }
+                    this.customRecipientEmail = '';
+                    this.showTestEmailModal = true;
+                },
+
+                async sendTestEmail() {
+                    let toList = [];
+                    if (this.testEmailMode === 'select') {
+                        toList = Array.isArray(this.selectedRecipients) ? this.selectedRecipients.map(x => (x || '').trim()).filter(Boolean) : [];
+                    } else {
+                        const single = (this.customRecipientEmail || '').trim();
+                        toList = single ? [single] : [];
+                    }
+
+                    if (toList.length === 0) {
+                        this.showToast('请选择或输入邮箱地址', 'error');
+                        return;
+                    }
+                    for (const mail of toList) {
+                        if (!this.validateEmail(mail)) {
+                            this.showToast('请输入有效的邮箱地址', 'error');
+                            return;
+                        }
+                    }
+                    try {
+                        this.showToast('发送中...', 'success');
+                        const resp = await fetch('/api/test-email', {
+                            method: 'POST',
+                            headers: this.getAuthHeaders(),
+                            body: JSON.stringify({ to: toList })
+                        });
+                        const data = await resp.json();
+                        this.showToast(data.message || '已发送', data.success ? 'success' : 'error');
+                        if (data.success) this.showTestEmailModal = false;
+                    } catch (e) { this.showToast('发送失败', 'error'); }
+                },
+
+                // 收件人相关
+                syncRecipientsFromString() {
+                    const str = (this.config.recipients || '').trim();
+                    this.recipientsList = str
+                        ? str.split(/[;,\n]/).map(s => s.trim()).filter(s => !!s)
+                        : [];
+                },
+                addRecipient() {
+                    const email = (this.recipientInput || '').trim();
+                    if (!email) return;
+                    if (!this.validateEmail(email)) {
+                        this.showToast('邮箱格式不正确', 'error');
+                        return;
+                    }
+                    if (this.recipientsList.includes(email)) {
+                        this.showToast('该邮箱已在列表中', 'error');
+                        this.recipientInput = '';
+                        return;
+                    }
+                    this.recipientsList.push(email);
+                    this.recipientInput = '';
+                },
+                removeRecipient(idx) {
+                    this.recipientsList.splice(idx, 1);
+                },
+                validateEmail(email) {
+                    // 简易校验即可
+                    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return re.test(email);
+                },
+
+                async submitManualCookie() {
+                    // Manual cookie logic... (同原代码，略)
+                     try {
+                        const resp = await fetch('/api/manual-cookie', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                source: this.manualCookie.source,
+                                cookie: this.manualCookie.cookie,
+                                user_agent: this.manualCookie.ua
+                            })
+                        });
+                        const data = await resp.json();
+                        this.showToast(data.message, data.success ? 'success' : 'error');
+                        if (data.success) this.showManualCookie = false;
+                    } catch (e) { this.showToast('Error', 'error'); }
+                },
+
+                showToast(message, type = 'success') {
+                    this.toast = { show: true, message, type };
+                    setTimeout(() => { this.toast.show = false; }, 3000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
