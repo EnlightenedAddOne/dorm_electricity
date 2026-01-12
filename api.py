@@ -17,11 +17,28 @@ def check_auth():
         return False
     return Config().verify_admin_token(token)
 
+
+@api_bp.route('/login-state')
+def get_login_state():
+    """获取扫码登录流程状态（轻量，不含二维码图片）。"""
+    try:
+        import auth as auth_mod
+        return jsonify({
+            "success": True,
+            "status": getattr(auth_mod, 'login_status', None),
+            "source": getattr(auth_mod, 'login_source', None)
+        })
+    except Exception as e:
+        logger.error(f"获取登录状态失败: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
 @api_bp.route('/status')
 def get_status():
     """获取系统状态 (公开)"""
     cfg = Config()
     sources = cfg.get_auth_sources()
+    labels = cfg.get_auth_labels()
+    source_recipient_map = cfg.get_source_recipient_map()
     cookies = {}
     for s in sources:
         c, _ua = cfg.get_auth(source=s)
@@ -45,7 +62,10 @@ def get_status():
         "next_check_in": next_check_in,
         "rooms": system_status["last_check_data"] or [],
         "auth_sources": sources,
+        "auth_labels": labels,
         "auth_configured": list(cookies.keys()),
+        # 公开接口不返回收件人列表，只返回哪些 source 配置了默认收件人
+        "notify_sources_configured": list(source_recipient_map.keys()),
         "source_status": system_status.get("sources", {})
     })
 
@@ -61,6 +81,41 @@ def manage_config():
     if request.method == 'POST':
         try:
             data = request.json
+
+            # === auth_sources（多宿舍 sources 列表）===
+            # 允许：
+            # - {"auth_sources": "a,b,c"}
+            # - {"auth_sources": ["a", "b", "c"]}
+            if 'auth_sources' in data:
+                raw = data.get('auth_sources')
+                if isinstance(raw, list):
+                    sources = [str(x).strip() for x in raw if str(x).strip()]
+                elif isinstance(raw, str):
+                    sources = [x.strip() for x in raw.replace(';', ',').replace('\n', ',').split(',') if x.strip()]
+                elif raw is None:
+                    sources = []
+                else:
+                    return jsonify({"success": False, "message": "auth_sources 类型错误"}), 400
+
+                # 过滤 legacy（legacy 由后端自动推断，不应手动配置）
+                sources = [s for s in sources if s.casefold() != 'legacy']
+
+                # 校验 source 名称
+                for s in sources:
+                    if not re.match(r'^[A-Za-z0-9_-]+$', s):
+                        return jsonify({"success": False, "message": f"source 名称不合法: {s}（仅允许 A-Za-z0-9_-）"}), 400
+
+                # 去重（大小写不敏感）但保留第一个出现的大小写
+                seen = set()
+                normalized = []
+                for s in sources:
+                    k = s.casefold()
+                    if k in seen:
+                        continue
+                    seen.add(k)
+                    normalized.append(s)
+                cfg._ensure_section('system')
+                cfg.cp.set('system', 'auth_sources', ','.join(normalized))
 
             # 房间收件人映射（notify.rooms）
             # 允许两种格式：
@@ -102,6 +157,90 @@ def manage_config():
                     if str(room_key).strip().casefold() == "config_file":
                         continue
                     cfg.set_room_recipients(room_key, recipients)
+
+            # source 默认收件人映射（notify.sources）
+            # 允许两种格式：
+            # - {"source_recipients": {"X3-721B": "a@x.com,b@y.com"}}
+            # - {"source_recipients": [{"source": "X3-721B", "recipients": ["a@x.com"]}, ...]}
+            if 'source_recipients' in data:
+                payload = data.get('source_recipients')
+                src_map = {}
+                if isinstance(payload, dict):
+                    src_map = payload
+                elif isinstance(payload, list):
+                    for item in payload:
+                        if not isinstance(item, dict):
+                            continue
+                        src = str(item.get('source') or '').strip()
+                        if not src:
+                            continue
+                        src_map[src] = item.get('recipients')
+                elif payload is None:
+                    src_map = {}
+                else:
+                    return jsonify({"success": False, "message": "source_recipients 类型错误"}), 400
+
+                def is_reserved_source_key(k: str) -> bool:
+                    kk = (k or "").strip()
+                    return (not kk) or (kk.casefold() == "config_file")
+
+                src_map = {str(k).strip(): v for k, v in src_map.items() if not is_reserved_source_key(str(k))}
+
+                existing = set(cfg.get_source_recipient_map().keys())
+                incoming = set([str(k).strip() for k in src_map.keys() if str(k).strip() and str(k).strip().casefold() != "config_file"])
+                for old_src in existing - incoming:
+                    cfg.set_source_recipients(old_src, [])
+
+                for src, recipients in src_map.items():
+                    if str(src).strip().casefold() == "config_file":
+                        continue
+                    cfg.set_source_recipients(src, recipients)
+
+            # source 显示名称（auth.labels）
+            # - {"auth_labels": {"X3-721B": "西三721B"}}
+            # - {"auth_labels": [{"source": "X3-721B", "label": "西三721B"}, ...]}
+            if 'auth_labels' in data:
+                payload = data.get('auth_labels')
+                labels_map = {}
+                if isinstance(payload, dict):
+                    labels_map = payload
+                elif isinstance(payload, list):
+                    for item in payload:
+                        if not isinstance(item, dict):
+                            continue
+                        src = str(item.get('source') or '').strip()
+                        if not src:
+                            continue
+                        labels_map[src] = item.get('label')
+                elif payload is None:
+                    labels_map = {}
+                else:
+                    return jsonify({"success": False, "message": "auth_labels 类型错误"}), 400
+
+                section = 'auth.labels'
+                cfg._ensure_section(section)
+                defaults = set(cfg.cp.defaults().keys())
+                # 先清理旧值（以本次提交为准）
+                if cfg.cp.has_section(section):
+                    for key, _v in list(cfg.cp.items(section)):
+                        k = str(key or '').strip()
+                        if not k:
+                            continue
+                        if k in defaults or k.casefold() == 'config_file':
+                            continue
+                        if k not in labels_map:
+                            cfg.cp.remove_option(section, k)
+
+                for src, label in labels_map.items():
+                    s = str(src or '').strip()
+                    if not s or s in defaults or s.casefold() == 'config_file':
+                        continue
+                    v = str(label or '').strip()
+                    if v:
+                        cfg.cp.set(section, s, v)
+                    else:
+                        if cfg.cp.has_option(section, s):
+                            cfg.cp.remove_option(section, s)
             
             # 更新配置
             if 'interval' in data:
@@ -130,6 +269,7 @@ def manage_config():
         return jsonify({
             "success": True,
             "config": {
+                "auth_sources": cfg.get_auth_sources(),
                 "interval": cfg.get_int("system", "interval", 900),
                 "threshold": cfg.get_float("system", "low_power_threshold", 15.0),
                 "cooldown_seconds": cfg.get_int("system", "low_power_alert_cooldown_seconds", 21600),
@@ -138,7 +278,9 @@ def manage_config():
                 "smtp_username": cfg.get("notify", "smtp_username"),
                 "server_ip": cfg.get("system", "server_ip"),
                 "web_port": cfg.get_int("system", "web_port", 5000),
-                "room_recipients": cfg.get_room_recipient_map()
+                "room_recipients": cfg.get_room_recipient_map(),
+                "source_recipients": cfg.get_source_recipient_map(),
+                "auth_labels": cfg.get_auth_labels()
             }
         })
 

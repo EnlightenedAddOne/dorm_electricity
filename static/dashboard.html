@@ -113,7 +113,7 @@
                         <div>
                             <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">登录状态</p>
                             <h3 class="text-xl sm:text-2xl font-bold" :class="getLoginSummaryTextClass()">
-                                <span x-text="getLoginSummaryText()"></span>
+                                <span x-text="getLoginTitleText()"></span>
                             </h3>
                         </div>
                         <div :class="getLoginSummaryIconClass()" 
@@ -122,44 +122,22 @@
                         </div>
                     </div>
                     <div class="space-y-2.5">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <a :href="isAuthSourceConnected('ac_a') ? '/login?source=ac_a&force=1' : '/login?source=ac_a'" target="_blank"
-                               @click="if (isAuthSourceConnected('ac_a') && !confirm('A宿舍当前显示已连接。确定要重新扫码覆盖登录吗？')) { $event.preventDefault(); }"
-                               :aria-disabled="'false'"
-                               :title="isAuthSourceConnected('ac_a') ? 'A宿舍已连接：点击可重新扫码(覆盖)' : '点击打开二维码登录'"
-                               class="block w-full text-center px-3 py-2.5 rounded-xl transition text-sm font-medium"
-                               :class="isAuthSourceConnected('ac_a')
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
-                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-200 shadow-lg'">
-                                <i class="fas mr-2" :class="isAuthSourceConnected('ac_a') ? 'fa-check-circle' : 'fa-qrcode'"></i>
-                                <span x-text="isAuthSourceConnected('ac_a') ? 'A宿舍(空调)' : 'A宿舍(空调)'"></span>
-                            </a>
-                            <a :href="isAuthSourceConnected('ac_b') ? '/login?source=ac_b&force=1' : '/login?source=ac_b'" target="_blank"
-                               @click="if (isAuthSourceConnected('ac_b') && !confirm('B宿舍当前显示已连接。确定要重新扫码覆盖登录吗？')) { $event.preventDefault(); }"
-                               :aria-disabled="'false'"
-                               :title="isAuthSourceConnected('ac_b') ? 'B宿舍已连接：点击可重新扫码(覆盖)' : '点击打开二维码登录'"
-                               class="block w-full text-center px-3 py-2.5 rounded-xl transition text-sm font-medium"
-                               :class="isAuthSourceConnected('ac_b')
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
-                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-200 shadow-lg'">
-                                <i class="fas mr-2" :class="isAuthSourceConnected('ac_b') ? 'fa-check-circle' : 'fa-qrcode'"></i>
-                                <span x-text="isAuthSourceConnected('ac_b') ? 'B宿舍(空调)' : 'B宿舍(空调)'"></span>
-                            </a>
-                            <a :href="isAuthSourceConnected('k') ? '/login?source=k&force=1' : '/login?source=k'" target="_blank"
-                               @click="if (isAuthSourceConnected('k') && !confirm('K宿舍当前显示已连接。确定要重新扫码覆盖登录吗？')) { $event.preventDefault(); }"
-                               :aria-disabled="'false'"
-                               :title="isAuthSourceConnected('k') ? 'K宿舍已连接：点击可重新扫码(覆盖)' : '点击打开二维码登录'"
-                               class="block w-full text-center px-3 py-2.5 rounded-xl transition text-sm font-medium"
-                               :class="isAuthSourceConnected('k')
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
-                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-200 shadow-lg'">
-                                <i class="fas mr-2" :class="isAuthSourceConnected('k') ? 'fa-check-circle' : 'fa-qrcode'"></i>
-                                <span x-text="isAuthSourceConnected('k') ? 'K宿舍(照明)' : 'K宿舍(照明)'"></span>
-                            </a>
+                        <div class="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5">
+                            <div class="text-sm text-slate-700 flex items-center gap-2 min-w-0">
+                                <span class="inline-flex items-center gap-2 min-w-0">
+                                    <span class="w-2.5 h-2.5 rounded-full"
+                                          :class="getLoginConnectedCount() >= getDisplayAuthSources().length ? 'bg-emerald-500' : (getLoginConnectedCount() > 0 ? 'bg-amber-500' : 'bg-rose-500')"></span>
+                                    <span class="truncate" x-text="getLoginSummaryText()"></span>
+                                </span>
+                                <span class="text-xs text-slate-400 shrink-0" x-text="'(共 ' + getDisplayAuthSources().length + ' 个)'"></span>
+                            </div>
+
+                            <button type="button"
+                                    @click="showAuthSourcesModal = true"
+                                    class="text-xs font-semibold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-3 py-2 rounded-lg transition">
+                                <i class="fas fa-list mr-1"></i>查看
+                            </button>
                         </div>
-                        <button @click="showManualCookie = true" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl transition text-sm font-medium">
-                            <i class="fas fa-keyboard mr-2"></i>手动输入
-                        </button>
                     </div>
                 </div>
 
@@ -176,8 +154,15 @@
                                 <span x-text="status.is_monitoring ? '运行中' : '已暂停'"></span>
                             </h3>
                         </div>
-                        <div class="bg-indigo-50 text-indigo-500 rounded-xl p-3">
-                            <i class="fas fa-heartbeat text-xl"></i>
+                        <div class="flex items-center gap-2">
+                            <button x-show="isAdmin" @click="toggleMonitoring()"
+                                    class="text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl transition border border-blue-100">
+                                <i class="fas mr-1.5" :class="status.is_monitoring ? 'fa-pause' : 'fa-play'"></i>
+                                <span x-text="status.is_monitoring ? '暂停监控' : '恢复监控'"></span>
+                            </button>
+                            <div class="bg-indigo-50 text-indigo-500 rounded-xl p-3">
+                                <i class="fas fa-heartbeat text-xl"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-4 bg-slate-50 rounded-lg p-3 border border-slate-100">
@@ -185,14 +170,6 @@
                              <span class="text-slate-500"><i class="fas fa-history mr-1"></i>检测间隔</span>
                              <span class="font-mono font-medium text-slate-700" x-text="Math.floor(status.interval / 60) + ' min'"></span>
                          </div>
-                    </div>
-                    
-                    <div x-show="isAdmin" class="mt-4 pt-3 border-t border-slate-100 flex justify-end">
-                         <button @click="toggleMonitoring()" 
-                                 class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 px-3 py-1.5 rounded-lg transition">
-                             <i class="fas mr-1.5" :class="status.is_monitoring ? 'fa-pause' : 'fa-play'"></i>
-                             <span x-text="status.is_monitoring ? '暂停监控' : '恢复监控'"></span>
-                         </button>
                     </div>
                 </div>
 
@@ -292,6 +269,39 @@
                 </div>
 
                 <form @submit.prevent="saveConfig()" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">宿舍账号列表 (auth_sources)</label>
+                        <p class="text-xs text-gray-400 mb-3">用于“登录按钮列表化 / 多宿舍支持”。每个 source 仅允许 A-Za-z0-9_-，大小写不敏感。新增后可去仪表盘扫码/手动输入 Cookie。</p>
+
+                        <div class="w-full border border-gray-200 rounded-xl bg-slate-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition">
+                            <div class="flex flex-wrap gap-2 p-3">
+                                <template x-for="(src, idx) in authSourcesList" :key="src">
+                                    <span class="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg text-xs border border-indigo-200">
+                                        <i class="fas fa-layer-group"></i>
+                                        <span x-text="src"></span>
+                                        <button type="button" class="ml-1 text-indigo-500 hover:text-indigo-700" @click="removeAuthSource(idx)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </span>
+                                </template>
+
+                                <input type="text"
+                                       x-model.trim="authSourceInput"
+                                       @keydown.enter.prevent="addAuthSource()"
+                                       placeholder="例如：x3_721b"
+                                       class="flex-1 min-w-[180px] bg-transparent px-2 py-1.5 outline-none text-sm text-slate-700 placeholder:text-slate-400"/>
+                                <button type="button" @click="addAuthSource()"
+                                        class="text-xs bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-2.5 py-1.5 rounded-lg transition">
+                                    添加
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 text-xs text-gray-400">
+                            保存后会写入 config.ini 的 [system].auth_sources。
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">检测间隔 (秒)</label>
@@ -422,6 +432,48 @@
                         </div>
                     </div>
                     
+                    <div class="pt-2">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-slate-700">Source → 默认收件人 / 显示名称</label>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">当某个房间未配置映射时，将按 source 默认收件人发送告警（新模式默认）。显示名称用于仪表盘按钮展示。</p>
+
+                        <div x-show="recipientsList.length === 0" class="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-4">
+                            请先在上方“邮件收件人”里添加至少一个邮箱，然后再配置 source 默认收件人。
+                        </div>
+
+                        <div x-show="recipientsList.length > 0" class="space-y-3">
+                            <template x-for="src in availableSources()" :key="src">
+                                <div class="bg-white border border-gray-200 rounded-xl p-3" x-init="sourceRecipientMap[src] = sourceRecipientMap[src] || []; authLabelsMap[src] = (authLabelsMap[src] || '')">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="text-sm font-medium text-slate-700" x-text="src"></div>
+                                        <div class="text-xs text-slate-400" x-text="getSourceRecipientCount(src) + ' 个收件人'"></div>
+                                    </div>
+
+                                    <label class="block text-xs text-slate-500 mb-1">显示名称（可选）</label>
+                                    <input type="text" x-model.trim="authLabelsMap[src]"
+                                           class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm text-slate-700"
+                                           placeholder="例如：西三721B宿舍">
+
+                                    <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        <template x-for="mail in recipientsList" :key="mail">
+                                            <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                                                <input type="checkbox" class="accent-blue-600"
+                                                       :checked="isSourceRecipientSelected(src, mail)"
+                                                       @change="toggleSourceRecipient(src, mail, $event.target.checked)">
+                                                <span class="text-slate-700" x-text="mail"></span>
+                                            </label>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div x-show="availableSources().length === 0" class="text-sm text-slate-400 bg-white border border-dashed border-slate-300 rounded-xl p-4">
+                                当前没有配置任何 source。
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">服务器IP (用于链接)</label>
                         <div class="relative">
@@ -496,17 +548,95 @@
         </div>
     </div>
 
-    <div x-show="showManualCookie" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showManualCookie = false">
+    <div x-show="showManualCookie" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" @click.self="closeManualCookie()">
         <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <h3 class="text-lg font-bold mb-4">手动输入Cookie</h3>
-            <label class="block text-sm text-slate-600 mb-2">选择账号</label>
-            <select x-model="manualCookie.source" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4">
-                <option value="ac_a">A宿舍账号 (ac_a)</option>
-                <option value="ac_b">B宿舍账号 (ac_b)</option>
-                <option value="k">K宿舍账号 (k)</option>
+            <label class="block text-sm text-slate-600 mb-2">账号</label>
+            <div x-show="manualCookieSourceLocked" class="w-full px-3 py-2 border border-gray-200 rounded-lg mb-4 bg-slate-50 text-slate-700">
+                <span class="font-semibold" x-text="getAuthSourceLabel(manualCookie.source)"></span>
+                <span class="text-xs text-slate-500 ml-2" x-text="'(' + manualCookie.source + ')'"></span>
+            </div>
+            <select x-show="!manualCookieSourceLocked" x-model="manualCookie.source" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4">
+                <template x-for="src in getDisplayAuthSources()" :key="src">
+                    <option :value="src" x-text="getAuthSourceLabel(src) + ' (' + src + ')' "></option>
+                </template>
             </select>
             <input type="text" x-model="manualCookie.cookie" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4" placeholder="JSESSIONID=...">
             <button @click="submitManualCookie()" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg">保存</button>
+        </div>
+    </div>
+
+    <!-- 宿舍账号列表（弹窗可滚动） -->
+    <div x-show="showAuthSourcesModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showAuthSourcesModal = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">宿舍账号</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">点击对应账号打开二维码登录；列表支持滚动。</p>
+                </div>
+                <button type="button" class="w-9 h-9 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500" @click="showAuthSourcesModal = false">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="px-5 py-4">
+                <div x-show="isLoginBusy()" class="mb-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-3 py-2 text-sm">
+                    <i class="fas fa-lock mr-2"></i>
+                    <span>当前正在扫码：</span>
+                    <span class="font-semibold" x-text="loginState && loginState.source ? getAuthSourceLabel(loginState.source) : '未知'"></span>
+                    <span class="text-xs ml-2">（一次只能扫一个）</span>
+                </div>
+
+                <div class="max-h-[60vh] overflow-auto pr-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <template x-for="src in getDisplayAuthSources()" :key="src">
+                            <div class="border rounded-xl p-3" :class="isAuthSourceConnected(src) ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white'">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2.5 h-2.5 rounded-full" :class="isAuthSourceConnected(src) ? 'bg-emerald-500' : 'bg-slate-300'"></span>
+                                            <div class="font-semibold text-slate-800 truncate" x-text="getAuthSourceLabel(src)"></div>
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-1" x-text="'source: ' + src"></div>
+                                    </div>
+
+                                    <div class="shrink-0 flex items-center gap-2">
+                                        <button type="button"
+                                                @click="openManualCookieForSource(src)"
+                                                class="px-3 py-2 rounded-xl text-xs font-semibold transition border bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+                                                :disabled="false"
+                                                :title="'为 ' + getAuthSourceLabel(src) + ' 手动输入 Cookie'">
+                                            <i class="fas fa-keyboard mr-1"></i>
+                                            <span>手动</span>
+                                        </button>
+
+                                        <a :href="getLoginHref(src)" target="_blank"
+                                           @click="handleLoginClick($event, src)"
+                                           :aria-disabled="isLoginLockedForSource(src) ? 'true' : 'false'"
+                                           :title="getLoginButtonTitle(src)"
+                                           class="px-3 py-2 rounded-xl text-xs font-semibold transition border"
+                                           :class="isLoginLockedForSource(src)
+                                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                                                : (isAuthSourceConnected(src)
+                                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
+                                                    : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600')">
+                                            <i class="fas mr-1" :class="isLoginLockedForSource(src) ? 'fa-lock' : (isAuthSourceConnected(src) ? 'fa-redo' : 'fa-qrcode')"></i>
+                                            <span x-text="isAuthSourceConnected(src) ? '重新扫码' : '扫码登录'"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
+                <div class="text-xs text-slate-400">提示：每个账号右侧支持“手动”或“扫码”。</div>
+                <button type="button" class="text-sm font-semibold bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl" @click="showAuthSourcesModal = false">
+                    关闭
+                </button>
+            </div>
         </div>
     </div>
 
@@ -579,6 +709,7 @@
             return {
                 showTab: 'dashboard', 
                 showManualCookie: false,
+                showAuthSourcesModal: false,
                 showAdminLogin: false,
                 showSetup: false,
                 showTestEmailModal: false,
@@ -588,8 +719,10 @@
                 currentTime: '',
                 
                 status: { is_monitoring: true, has_cookie: false, last_check_time: null, rooms: [], interval: 900, auth_sources: [], auth_configured: [] },
+                loginState: { status: null, source: null },
                 // 预填一些配置数据以便预览
                 config: { 
+                    auth_sources: [],
                     interval: 1800, 
                     threshold: 20, 
                     cooldown_seconds: 21600,
@@ -599,6 +732,13 @@
                 },
                 // 房间映射：room -> recipients[]（多对多）
                 roomRecipientMap: {},
+                // source 默认收件人：source -> recipients[]
+                sourceRecipientMap: {},
+                // source 显示名称：source -> label
+                authLabelsMap: {},
+                // auth_sources 编辑
+                authSourcesList: [],
+                authSourceInput: '',
                     // 收件人管理（前端增强）
                     recipientsList: [],
                     recipientInput: '',
@@ -607,7 +747,11 @@
                     customRecipientEmail: '',
                     testEmailMode: 'select', // 'select' | 'custom'
                 manualCookie: { source: 'ac_a', cookie: '', ua: '' },
+                manualCookieSourceLocked: false,
                 toast: { show: false, message: '', type: 'success' },
+                // 登录按钮展示优化（sources 很多时）
+                showAllAuthSources: false,
+                maxAuthSourcesCollapsed: 6,
 
                 init() {
                     this.updateTime();
@@ -623,6 +767,10 @@
                     this.loadStatus();
                     setInterval(() => this.loadStatus(), 5000);
 
+                    // 登录流程状态（用于“一次只能扫一个”）
+                    this.loadLoginState();
+                    setInterval(() => this.loadLoginState(), 3000);
+
                     // 初始化收件人列表
                     this.syncRecipientsFromString();
                     if (this.recipientsList.length > 0) {
@@ -635,16 +783,26 @@
                     // legacy 单源模式：只显示一个总状态
                     if (sources.includes('legacy')) return ['legacy'];
 
-                    const base = ['ac_a', 'ac_b', 'k'];
-                    const extras = sources.filter(s => s && !base.includes(s) && s !== 'legacy');
-                    const merged = [...base, ...extras];
+                    // 正常情况：直接按后端给的 sources 展示（不强行补 ac_a/ac_b/k）
+                    const cleaned = sources.filter(s => s && s !== 'legacy');
+                    if (cleaned.length) return cleaned;
 
                     // 兜底：如果后端没给 sources（旧版本），至少显示 3 个宿舍
-                    return merged.length ? merged : base;
+                    return ['ac_a', 'ac_b', 'k'];
+                },
+
+                getLoginButtonSources() {
+                    const list = this.getDisplayAuthSources();
+                    if (this.showAllAuthSources) return list;
+                    const maxN = parseInt(this.maxAuthSourcesCollapsed || 6, 10);
+                    if (!maxN || maxN <= 0) return list;
+                    return list.slice(0, maxN);
                 },
 
                 getAuthSourceLabel(src) {
                     const key = (src || '').toString();
+                    const labelMap = (this.status && this.status.auth_labels && typeof this.status.auth_labels === 'object') ? this.status.auth_labels : {};
+                    if (labelMap && labelMap[key]) return labelMap[key];
                     const map = {
                         'ac_a': 'A宿舍(空调)',
                         'ac_b': 'B宿舍(空调)',
@@ -653,6 +811,70 @@
                         'legacy': '单源模式'
                     };
                     return map[key] || key;
+                },
+
+                isLoginBusy() {
+                    const st = (this.loginState && this.loginState.status) ? this.loginState.status : '';
+                    return ['processing', 'qr_ready'].includes(st);
+                },
+
+                isLoginLockedForSource(src) {
+                    if (!this.isLoginBusy()) return false;
+                    const cur = (this.loginState && this.loginState.source) ? this.loginState.source : null;
+                    if (!cur) return false;
+                    return cur !== src;
+                },
+
+                getLoginHref(src) {
+                    const key = (src || '').toString();
+                    let href = (key === 'legacy') ? '/login' : `/login?source=${encodeURIComponent(key)}`;
+                    if (this.isAuthSourceConnected(key)) {
+                        href += href.includes('?') ? '&force=1' : '?force=1';
+                    }
+                    return href;
+                },
+
+                getLoginButtonTitle(src) {
+                    if (this.isLoginLockedForSource(src)) {
+                        const cur = this.loginState && this.loginState.source ? this.getAuthSourceLabel(this.loginState.source) : '其他账号';
+                        return `正在为 ${cur} 扫码登录（一次只能扫一个）`;
+                    }
+                    return this.isAuthSourceConnected(src) ? '已连接：点击可重新扫码(覆盖)' : '点击打开二维码登录';
+                },
+
+                getLoginButtonClass(src) {
+                    if (this.isLoginLockedForSource(src)) {
+                        return 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed';
+                    }
+                    return this.isAuthSourceConnected(src)
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                        : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-200 shadow-lg';
+                },
+
+                handleLoginClick(e, src) {
+                    if (this.isLoginLockedForSource(src)) {
+                        e.preventDefault();
+                        const cur = this.loginState && this.loginState.source ? this.getAuthSourceLabel(this.loginState.source) : '其他账号';
+                        this.showToast(`当前正在为 ${cur} 扫码，请先完成/关闭该流程`, 'error');
+                        return;
+                    }
+                    if (this.isAuthSourceConnected(src)) {
+                        if (!confirm(`${this.getAuthSourceLabel(src)} 当前显示已连接。确定要重新扫码覆盖登录吗？`)) {
+                            e.preventDefault();
+                        }
+                    }
+                },
+
+                openManualCookieForSource(src) {
+                    const key = (src || '').toString();
+                    this.manualCookie.source = key;
+                    this.manualCookieSourceLocked = true;
+                    this.showManualCookie = true;
+                },
+
+                closeManualCookie() {
+                    this.showManualCookie = false;
+                    this.manualCookieSourceLocked = false;
                 },
 
                 isAuthSourceConnected(src) {
@@ -682,6 +904,18 @@
                         return connected ? '已连接' : '未连接';
                     }
                     return `已连接 ${connected}/${total}`;
+                },
+
+                getLoginTitleText() {
+                    const list = this.getDisplayAuthSources();
+                    const total = list.length;
+                    const connected = this.getLoginConnectedCount();
+                    if (total <= 1 && list[0] === 'legacy') {
+                        return connected ? '已连接' : '未连接';
+                    }
+                    if (connected <= 0) return '未连接';
+                    if (connected >= total) return '全部已连接';
+                    return '部分已连接';
                 },
 
                 getLoginSummaryTextClass() {
@@ -793,8 +1027,22 @@
                     try {
                         const resp = await fetch('/api/status');
                         const data = await resp.json();
-                        if (data.success) this.status = data;
+                        if (data.success) {
+                            this.status = data;
+                            const list = this.getDisplayAuthSources();
+                            if (list.length && !list.includes(this.manualCookie.source)) {
+                                this.manualCookie.source = list[0];
+                            }
+                        }
                     } catch (e) { console.error(e); }
+                },
+
+                async loadLoginState() {
+                    try {
+                        const resp = await fetch('/api/login-state');
+                        const data = await resp.json();
+                        if (data && data.success) this.loginState = data;
+                    } catch (e) { /* ignore */ }
                 },
 
                 async loadConfig() {
@@ -829,6 +1077,48 @@
                                     this.roomRecipientMap[roomName] = arr;
                                 }
                             }
+
+                            // source_recipients -> sourceRecipientMap
+                            this.sourceRecipientMap = {};
+                            const sm = (this.config.source_recipients || {});
+                            if (sm && typeof sm === 'object' && !Array.isArray(sm)) {
+                                for (const [srcKeyRaw, rec] of Object.entries(sm)) {
+                                    const srcKey = (srcKeyRaw || '').toString().trim();
+                                    if (!srcKey) continue;
+                                    let arr = [];
+                                    if (Array.isArray(rec)) {
+                                        arr = rec.map(x => (x || '').toString().trim()).filter(Boolean);
+                                    } else {
+                                        const s = (rec || '').toString().trim();
+                                        arr = s ? s.split(/[;,\n]/).map(x => x.trim()).filter(Boolean) : [];
+                                    }
+                                    this.sourceRecipientMap[srcKey] = arr;
+                                }
+                            }
+
+                            // auth_labels -> authLabelsMap
+                            this.authLabelsMap = {};
+                            const lm = (this.config.auth_labels || {});
+                            if (lm && typeof lm === 'object' && !Array.isArray(lm)) {
+                                for (const [srcKeyRaw, label] of Object.entries(lm)) {
+                                    const srcKey = (srcKeyRaw || '').toString().trim();
+                                    if (!srcKey) continue;
+                                    const v = (label || '').toString().trim();
+                                    if (v) this.authLabelsMap[srcKey] = v;
+                                }
+                            }
+
+                            // auth_sources -> authSourcesList
+                            const as = this.config.auth_sources;
+                            if (Array.isArray(as)) {
+                                this.authSourcesList = as.map(x => (x || '').toString().trim()).filter(Boolean);
+                            } else if (typeof as === 'string') {
+                                this.authSourcesList = as.split(/[;,\n]/).map(x => x.trim()).filter(Boolean);
+                            } else {
+                                this.authSourcesList = [];
+                            }
+                            // 不允许手动设置 legacy
+                            this.authSourcesList = this.authSourcesList.filter(s => s.toLowerCase() !== 'legacy');
                         }
                     } catch (e) { console.error(e); }
                 },
@@ -849,6 +1139,32 @@
                         }
                         this.config.room_recipients = roomMap;
 
+                        // sourceRecipientMap -> source_recipients（以本次提交为准）
+                        const sourceMap = {};
+                        const src2 = (this.sourceRecipientMap || {});
+                        for (const [source, arr] of Object.entries(src2)) {
+                            const key = (source || '').toString().trim();
+                            if (!key) continue;
+                            const list = Array.isArray(arr) ? arr.map(x => (x || '').toString().trim()).filter(Boolean) : [];
+                            if (list.length > 0) sourceMap[key] = list;
+                        }
+                        this.config.source_recipients = sourceMap;
+
+                        // authLabelsMap -> auth_labels
+                        const labelsMap = {};
+                        const src3 = (this.authLabelsMap || {});
+                        for (const [source, label] of Object.entries(src3)) {
+                            const key = (source || '').toString().trim();
+                            if (!key) continue;
+                            const v = (label || '').toString().trim();
+                            if (v) labelsMap[key] = v;
+                        }
+                        this.config.auth_labels = labelsMap;
+
+                        // authSourcesList -> auth_sources
+                        const srcList = Array.isArray(this.authSourcesList) ? this.authSourcesList : [];
+                        this.config.auth_sources = srcList.map(x => (x || '').toString().trim()).filter(Boolean);
+
                         const resp = await fetch('/api/config', {
                             method: 'POST',
                             headers: this.getAuthHeaders(),
@@ -856,7 +1172,38 @@
                         });
                         const data = await resp.json();
                         this.showToast(data.message, data.success ? 'success' : 'error');
+                        if (data.success) {
+                            this.loadStatus();
+                        }
                     } catch (e) { this.showToast('保存失败', 'error'); }
+                },
+
+                validateSourceName(s) {
+                    const v = (s || '').toString().trim();
+                    if (!v) return false;
+                    if (v.toLowerCase() === 'legacy') return false;
+                    return /^[A-Za-z0-9_-]+$/.test(v);
+                },
+
+                addAuthSource() {
+                    const v = (this.authSourceInput || '').toString().trim();
+                    if (!this.validateSourceName(v)) {
+                        this.showToast('source 仅允许 A-Za-z0-9_-（且不能为 legacy）', 'error');
+                        return;
+                    }
+                    const exists = (this.authSourcesList || []).some(x => (x || '').toString().trim().toLowerCase() === v.toLowerCase());
+                    if (exists) {
+                        this.showToast('该 source 已存在', 'error');
+                        return;
+                    }
+                    this.authSourcesList.push(v);
+                    this.authSourceInput = '';
+                },
+
+                removeAuthSource(idx) {
+                    if (!Array.isArray(this.authSourcesList)) return;
+                    if (idx < 0 || idx >= this.authSourcesList.length) return;
+                    this.authSourcesList.splice(idx, 1);
                 },
 
                 availableRooms() {
@@ -901,6 +1248,43 @@
                 },
                 getRoomRecipientCount(roomName) {
                     const list = this.ensureRoomArray(roomName);
+                    return Array.isArray(list) ? list.length : 0;
+                },
+
+                availableSources() {
+                    return this.getDisplayAuthSources().filter(s => s && s !== 'legacy');
+                },
+
+                ensureSourceArray(source) {
+                    const key = (source || '').toString().trim();
+                    if (!key) return [];
+                    const cur = this.sourceRecipientMap[key];
+                    if (!Array.isArray(cur)) {
+                        this.sourceRecipientMap[key] = [];
+                    }
+                    return this.sourceRecipientMap[key];
+                },
+
+                isSourceRecipientSelected(source, mail) {
+                    const list = this.ensureSourceArray(source);
+                    const m = (mail || '').toString().trim();
+                    return m ? list.includes(m) : false;
+                },
+
+                toggleSourceRecipient(source, mail, checked) {
+                    const list = this.ensureSourceArray(source);
+                    const m = (mail || '').toString().trim();
+                    if (!m) return;
+                    if (checked) {
+                        if (!list.includes(m)) list.push(m);
+                    } else {
+                        const idx = list.indexOf(m);
+                        if (idx >= 0) list.splice(idx, 1);
+                    }
+                },
+
+                getSourceRecipientCount(source) {
+                    const list = this.ensureSourceArray(source);
                     return Array.isArray(list) ? list.length : 0;
                 },
 
@@ -1005,7 +1389,7 @@
                         });
                         const data = await resp.json();
                         this.showToast(data.message, data.success ? 'success' : 'error');
-                        if (data.success) this.showManualCookie = false;
+                        if (data.success) this.closeManualCookie();
                     } catch (e) { this.showToast('Error', 'error'); }
                 },
 

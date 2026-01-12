@@ -108,6 +108,33 @@ class Config:
         parts = [x.strip() for x in raw.replace(";", ",").replace("\n", ",").split(",")]
         return [x for x in parts if x]
 
+    def get_auth_labels(self):
+        """读取 source -> label 映射。
+
+        配置约定：
+
+        [auth.labels]
+        X3-721B = 西三721B宿舍
+
+        返回：dict[str, str]
+        """
+        section = "auth.labels"
+        if not self.cp.has_section(section):
+            return {}
+
+        labels = {}
+        defaults = set(self.cp.defaults().keys())
+        for key, value in self.cp.items(section):
+            k = str(key or "").strip()
+            if not k:
+                continue
+            if k in defaults or k.casefold() == "config_file":
+                continue
+            v = str(value or "").strip()
+            if v:
+                labels[k] = v
+        return labels
+
     def get_notify_group_recipients(self, group):
         """读取分组收件人。
 
@@ -120,6 +147,70 @@ class Config:
             return []
         parts = [x.strip() for x in raw.replace(";", ",").replace("\n", ",").split(",")]
         return [x for x in parts if x]
+
+    def get_source_recipient_map(self):
+        """读取 source 到收件人映射（默认告警按 source 分发）。
+
+        [notify.sources]
+        X3-721B = a@example.com,b@example.com
+
+        返回：dict[str, list[str]]
+        """
+        section = "notify.sources"
+        if not self.cp.has_section(section):
+            return {}
+
+        mapping = {}
+        defaults = set(self.cp.defaults().keys())
+        for key, value in self.cp.items(section):
+            source_key = str(key or "").strip()
+            if not source_key:
+                continue
+            if source_key in defaults or source_key.casefold() == "config_file":
+                continue
+            recipients = [x.strip() for x in str(value).replace(";", ",").replace("\n", ",").split(",") if x.strip()]
+            if recipients:
+                mapping[source_key] = recipients
+        return mapping
+
+    def get_source_recipients(self, source):
+        """按 source 获取收件人列表（找不到返回空列表）。"""
+        source_key = str(source or "").strip()
+        if not source_key:
+            return []
+
+        mapping = self.get_source_recipient_map()
+        if source_key in mapping:
+            return mapping[source_key]
+        sk = source_key.casefold()
+        for k, v in mapping.items():
+            if k.casefold() == sk:
+                return v
+        return []
+
+    def set_source_recipients(self, source, recipients):
+        """设置单个 source 的收件人（写入 config.ini）。"""
+        section = "notify.sources"
+        self._ensure_section(section)
+
+        source_key = str(source or "").strip()
+        if not source_key:
+            raise ValueError("source 不能为空")
+        if source_key in set(self.cp.defaults().keys()) or source_key.casefold() == "config_file":
+            raise ValueError("source 名称不允许使用保留键: config_file")
+
+        if isinstance(recipients, (list, tuple, set)):
+            rec_list = [str(x).strip() for x in recipients if str(x).strip()]
+        else:
+            rec_list = [x.strip() for x in str(recipients or "").replace(";", ",").replace("\n", ",").split(",") if x.strip()]
+
+        if not rec_list:
+            if self.cp.has_option(section, source_key):
+                self.cp.remove_option(section, source_key)
+        else:
+            self.cp.set(section, source_key, ",".join(rec_list))
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+            self.cp.write(f)
 
     def _normalize_room_key(self, room):
         return str(room or "").strip()

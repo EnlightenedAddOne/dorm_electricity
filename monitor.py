@@ -366,6 +366,10 @@ def monitor_task():
                                 if mail not in recipients:
                                     recipients.append(mail)
 
+                        # 若没有房间映射，回退到 source 默认收件人
+                        if not recipients:
+                            recipients = cfg.get_source_recipients(s)
+
                         # 若没有房间映射，按 source 分组回退
                         if not recipients:
                             if s == "ac_a":
@@ -418,14 +422,21 @@ def monitor_task():
                     # 回退到默认 notify.to
                     cfg.send_email(subject, content)
 
-            def send_room_alert(room, meter_type, subject, content):
+            def send_room_alert(room, meter_type, subject, content, source=None):
                 # 1) 优先按房间映射发送
                 room_recipients = cfg.get_room_recipients(room)
                 if room_recipients:
                     cfg.send_email(subject, content, to_override=room_recipients)
                     return
 
-                # 2) 无映射：按原有分组回退
+                # 2) 回退到 source 默认收件人（新模式：默认按 source 告警）
+                if source:
+                    source_recipients = cfg.get_source_recipients(source)
+                    if source_recipients:
+                        cfg.send_email(subject, content, to_override=source_recipients)
+                        return
+
+                # 3) 无映射：按原有分组回退（兼容旧模式）
                 if meter_type == "lighting":
                     send_alert(recipients_a, subject, content)
                     send_alert(recipients_b, subject, content)
@@ -454,7 +465,7 @@ def monitor_task():
                         subject = f"⚠️ 缺电警告: {d.get('kwh')}度"
                         content = f"房间/表计: {d.get('room')}\n剩余: {d.get('kwh')}度 / {d.get('money')}元\n请尽快充值!"
 
-                        send_room_alert(d.get('room'), meter_type, subject, content)
+                        send_room_alert(d.get('room'), meter_type, subject, content, source=d.get('source'))
 
                         if room_key:
                             last_low_power_email_time[room_key] = time.time()
@@ -476,3 +487,6 @@ def monitor_task():
             system_status["next_check_in"] = sleep_seconds
             _monitor_wakeup_event.wait(timeout=sleep_seconds)
             _monitor_wakeup_event.clear()
+
+
+            

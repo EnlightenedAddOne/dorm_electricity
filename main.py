@@ -16,6 +16,8 @@ os.environ['WDM_SSL_VERIFY'] = '0'
 
 # Flask应用
 app = Flask(__name__)
+# 避免浏览器缓存静态页面导致前端更新不生效
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.register_blueprint(api_bp)
 
 # 静态文件目录
@@ -26,7 +28,7 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 def dashboard():
     """管理仪表盘"""
     try:
-        return send_from_directory(STATIC_DIR, 'dashboard.html')
+        return send_from_directory(STATIC_DIR, 'dashboard.html', max_age=0)
     except:
         return "<h1>404</h1><p>dashboard.html not found in static/</p>", 404
 
@@ -35,7 +37,7 @@ def dashboard():
 def help_page():
     """帮助文档"""
     try:
-        return send_from_directory(STATIC_DIR, 'help.html')
+        return send_from_directory(STATIC_DIR, 'help.html', max_age=0)
     except:
         return "<h1>404</h1><p>help.html not found in static/</p>", 404
 
