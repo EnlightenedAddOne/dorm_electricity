@@ -2,9 +2,16 @@
 宿舍电费监控系统 - 主入口
 """
 import os
+import sys
 import threading
 import urllib3
 from flask import Flask, render_template, jsonify, send_from_directory, request
+
+# 确保无论从哪个工作目录启动，都能导入本项目同目录下的模块（config/api/monitor/auth 等）
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 from config import Config, logger
 from monitor import monitor_task
 import auth
@@ -33,7 +40,7 @@ def dashboard():
         return "<h1>404</h1><p>dashboard.html not found in static/</p>", 404
 
 
-@app.route('/help')
+@app.route('/help', strict_slashes=False)
 def help_page():
     """帮助文档"""
     try:

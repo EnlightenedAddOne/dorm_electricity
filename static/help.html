@@ -103,7 +103,8 @@
                 <li><a @click="sidebarOpen = false" href="#quick-start" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">快速开始</a></li>
                 <li><a @click="sidebarOpen = false" href="#cookie-guide" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">Cookie教程</a></li>
                 <li><a @click="sidebarOpen = false" href="#config" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">配置说明</a></li>
-                <li><a @click="sidebarOpen = false" href="#faq" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">常见问题</a></li>
+                <li><a @click="sidebarOpen = false" href="#faq" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">常见问题/排障</a></li>
+                <li><a @click="sidebarOpen = false" href="#api" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">API接口</a></li>
                 <li><a @click="sidebarOpen = false" href="#tech-stack" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">技术栈</a></li>
             </ul>
         </div>
@@ -125,7 +126,8 @@
                     <li><a href="#quick-start" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">快速开始</a></li>
                     <li><a href="#cookie-guide" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">Cookie教程</a></li>
                     <li><a href="#config" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">配置说明</a></li>
-                    <li><a href="#faq" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">常见问题</a></li>
+                    <li><a href="#faq" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">常见问题/排障</a></li>
+                    <li><a href="#api" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">API接口</a></li>
                     <li><a href="#tech-stack" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">技术栈</a></li>
                 </ul>
             </div>
@@ -142,7 +144,7 @@
                 </h2>
                 <p class="text-gray-700 leading-relaxed">
                     <strong>宿舍电费监控系统</strong>是一个自动化监控工具,定期检测校园宿舍剩余电量并在电量不足时发送邮件提醒。
-                    系统采用Docker容器化部署,支持多房间监控,提供友好的Web管理界面。
+                    系统提供 Web 管理界面（仪表盘/配置/扫码登录），支持多账号（多 source）轮询，并在 Cookie 失效或低电量时自动邮件告警。
                 </p>
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-4">
                     <p class="text-blue-800">
@@ -157,7 +159,7 @@
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
                     <i class="fas fa-star text-blue-500"></i> 功能特性
                 </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-6">
                     <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                         <h3 class="font-bold text-blue-800 mb-2">
                             <i class="fas fa-robot mr-2"></i>自动化监控
@@ -168,7 +170,7 @@
                         <h3 class="font-bold text-green-800 mb-2">
                             <i class="fas fa-envelope mr-2"></i>邮件提醒
                         </h3>
-                        <p class="text-sm text-gray-700">低电量时自动发送邮件通知</p>
+                        <p class="text-sm text-gray-700">低电量告警 + Cookie 失效修复提醒（含扫码链接）</p>
                     </div>
                     <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                         <h3 class="font-bold text-purple-800 mb-2">
@@ -178,9 +180,21 @@
                     </div>
                     <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                         <h3 class="font-bold text-yellow-800 mb-2">
-                            <i class="fas fa-cubes mr-2"></i>Docker部署
+                            <i class="fas fa-layer-group mr-2"></i>多账号/多宿舍（source）
                         </h3>
-                        <p class="text-sm text-gray-700">支持Docker容器化部署，简化安装维护</p>
+                        <p class="text-sm text-gray-700">按 source 独立保存 Cookie 与 UA，统一合并展示数据</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                        <h3 class="font-bold text-slate-800 mb-2">
+                            <i class="fas fa-user-shield mr-2"></i>管理员权限
+                        </h3>
+                        <p class="text-sm text-gray-700">配置/暂停监控等操作走管理员 Token 鉴权</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-rose-50 to-rose-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                        <h3 class="font-bold text-rose-800 mb-2">
+                            <i class="fas fa-shield-alt mr-2"></i>告警防轰炸
+                        </h3>
+                        <p class="text-sm text-gray-700">低电量告警带冷却时间，网络故障自动退避重试</p>
                     </div>
                 </div>
             </section>
@@ -190,28 +204,73 @@
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
                     <i class="fas fa-rocket text-blue-500"></i> 快速开始
                 </h2>
+
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-4">
+                    <p class="text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        本项目默认以 <strong>Python 直接运行</strong> 的方式部署；如果你有容器化需求，可自行补充 Dockerfile/compose（代码层面没有强依赖）。
+                    </p>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-800 mt-6">
+                    <span class="step-number">0</span>准备环境
+                </h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li>Python 3.9+（建议 3.9/3.10/3.11）</li>
+                    <li>安装依赖：Flask / requests / bs4 / selenium / webdriver-manager</li>
+                    <li>若使用扫码登录：本机需要可用的 Chrome/Chromium（Windows 一般已安装 Chrome）</li>
+                </ul>
+                <div class="code-block">
+                    <code>pip install -r requirements.txt</code>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-800 mt-6">
+                    <span class="step-number">1</span>启动服务
+                </h3>
+                <div class="code-block">
+                    <code>python main.py</code>
+                </div>
+                <p class="text-gray-700">
+                    默认端口来自 <code class="bg-gray-200 px-2 py-1 rounded font-mono">config.ini</code> 的 <code class="bg-gray-200 px-2 py-1 rounded font-mono">[system].web_port</code>（默认 5000）。
+                </p>
+
+                <h3 class="text-xl font-semibold text-gray-800 mt-6">
+                    <span class="step-number">2</span>打开仪表盘与扫码页
+                </h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li>仪表盘：<code class="bg-gray-200 px-2 py-1 rounded font-mono">http://0.0.0.0:5000/</code></li>
+                    <li>帮助页：<code class="bg-gray-200 px-2 py-1 rounded font-mono">http://0.0.0.0:5000/help</code></li>
+                    <li>扫码登录：<code class="bg-gray-200 px-2 py-1 rounded font-mono">http://0.0.0.0:5000/login</code></li>
+                </ul>
+
+                <h3 class="text-xl font-semibold text-gray-800 mt-6">
+                    <span class="step-number">3</span>首次设置管理员 Token（推荐）
+                </h3>
+                <p class="text-gray-700">
+                    配置接口（如读取/保存邮件参数、阈值、sources 等）需要管理员 Token。你可以在仪表盘右上角点击管理员按钮登录/设置。
+                </p>
+
+                <h3 class="text-xl font-semibold text-gray-800 mt-6">
+                    <span class="step-number">4</span>配置邮件与阈值
+                </h3>
+                <p class="text-gray-700">进入“配置”页，建议至少完成：</p>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li><strong>SMTP 邮箱</strong>：<code class="bg-gray-200 px-2 py-1 rounded font-mono">[notify].smtp_*</code>、<code class="bg-gray-200 px-2 py-1 rounded font-mono">[notify].from</code></li>
+                    <li><strong>收件人</strong>：<code class="bg-gray-200 px-2 py-1 rounded font-mono">[notify].to</code>（或更精细的 rooms/sources 映射）</li>
+                    <li><strong>低电量阈值</strong>：<code class="bg-gray-200 px-2 py-1 rounded font-mono">[system].low_power_threshold</code></li>
+                </ul>
                 
                 <h3 class="text-xl font-semibold text-gray-800 mt-6">
-                    <span class="step-number">1</span>登录系统
+                    <span class="step-number">5</span>登录系统（配置 Cookie）
                 </h3>
-                <p class="text-gray-700">有两种方式登录:</p>
+                <p class="text-gray-700">有两种方式配置 Cookie：</p>
                 <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
-                    <li><strong>扫码登录(推荐)</strong>: 点击"扫码登录"按钮,使用微信扫描二维码</li>
-                    <li><strong>手动输入</strong>: 点击"手动输入"按钮,粘贴从浏览器获取的Cookie</li>
+                    <li><strong>扫码登录(推荐)</strong>: 打开 <code class="bg-gray-200 px-2 py-1 rounded font-mono">/login</code>，使用微信扫码后系统自动保存 <code class="bg-gray-200 px-2 py-1 rounded font-mono">JSESSIONID</code></li>
+                    <li><strong>手动输入</strong>: 通过仪表盘的“手动输入 Cookie”（后端走 <code class="bg-gray-200 px-2 py-1 rounded font-mono">/api/manual-cookie</code>）</li>
                 </ul>
 
                 <h3 class="text-xl font-semibold text-gray-800 mt-6">
-                    <span class="step-number">2</span>配置参数
-                </h3>
-                <p class="text-gray-700">进入"配置"页面,设置以下参数:</p>
-                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
-                    <li><strong>检测间隔</strong>: 建议900秒(15分钟)</li>
-                    <li><strong>低电量阈值</strong>: 建议15度</li>
-                    <li><strong>邮件收件人</strong>: 填写接收通知的邮箱地址</li>
-                </ul>
-
-                <h3 class="text-xl font-semibold text-gray-800 mt-6">
-                    <span class="step-number">3</span>测试邮件
+                    <span class="step-number">6</span>发送测试邮件
                 </h3>
                 <p class="text-gray-700">
                     点击"发送测试邮件"按钮,确认邮件配置正常。如果收到测试邮件,说明系统配置成功。
@@ -223,6 +282,23 @@
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
                     <i class="fas fa-cookie-bite text-blue-500"></i> Cookie获取教程
                 </h2>
+
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 my-4">
+                    <p class="text-green-800">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <strong>优先推荐：</strong>直接使用系统自带的扫码页 <code class="bg-white px-2 py-1 rounded font-mono border">/login</code> 获取 Cookie（无需手动抓包）。
+                    </p>
+                    <ul class="list-disc list-inside text-green-900/80 mt-2 space-y-1">
+                        <li>默认扫码：<code class="bg-white px-2 py-1 rounded font-mono border">/login</code></li>
+                        <li>指定某个账号(source)的扫码：<code class="bg-white px-2 py-1 rounded font-mono border">/login?source=xxx</code></li>
+                        <li>二维码卡住/失效：<code class="bg-white px-2 py-1 rounded font-mono border">/login?force=1</code> 或 <code class="bg-white px-2 py-1 rounded font-mono border">/login-restart</code></li>
+                    </ul>
+                </div>
+
+                <p class="text-gray-700 leading-relaxed">
+                    系统抓取页面依赖业务站点的会话 Cookie（核心是 <code class="bg-gray-200 px-2 py-1 rounded font-mono">JSESSIONID</code>）。
+                    Cookie 失效时，监控线程会在连续失败且判定为“需要重新登录”后，自动发送“修复邮件”，邮件里会带上可点击的扫码链接（链接由 <code class="bg-gray-200 px-2 py-1 rounded font-mono">[system].server_ip</code> + <code class="bg-gray-200 px-2 py-1 rounded font-mono">web_port</code> 生成）。
+                </p>
                 
                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 my-4">
                     <p class="text-yellow-800">
@@ -305,52 +381,115 @@
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
                     <i class="fas fa-cog text-blue-500"></i> 配置说明
                 </h2>
-                
-                <div class="overflow-x-auto my-6">
-                    <table class="min-w-full border border-gray-300">
+
+                <p class="text-gray-700 leading-relaxed">
+                    所有配置存放在项目根目录的 <code class="bg-gray-200 px-2 py-1 rounded font-mono">config.ini</code>。
+                    系统支持<strong>多 source</strong>：每个 source 对应独立的 <code class="bg-gray-200 px-2 py-1 rounded font-mono">[auth.&lt;source&gt;]</code> 段（独立 Cookie/UA），监控线程会按 <code class="bg-gray-200 px-2 py-1 rounded font-mono">[system].auth_sources</code> 轮询并合并结果。
+                </p>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">1) system（运行参数）</h3>
+                <div class="overflow-x-auto my-4">
+                    <table class="min-w-full border border-gray-300 text-sm">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="border border-gray-300 px-4 py-2 text-left">配置项</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">说明</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">推荐值</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">键</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">作用</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">示例/推荐</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm">
+                        <tbody>
                             <tr>
-                                <td class="border border-gray-300 px-4 py-2 font-medium">检测间隔</td>
-                                <td class="border border-gray-300 px-4 py-2">每次检测的时间间隔(秒)</td>
-                                <td class="border border-gray-300 px-4 py-2">900(15分钟)</td>
+                                <td class="border border-gray-300 px-4 py-2 font-mono">interval</td>
+                                <td class="border border-gray-300 px-4 py-2">监控抓取间隔（秒）。网络/服务器故障时会自动退避（更快重试）。</td>
+                                <td class="border border-gray-300 px-4 py-2">900（15 分钟）</td>
                             </tr>
                             <tr class="bg-gray-50">
-                                <td class="border border-gray-300 px-4 py-2 font-medium">低电量阈值</td>
-                                <td class="border border-gray-300 px-4 py-2">低于此值发送邮件(度)</td>
-                                <td class="border border-gray-300 px-4 py-2">15度</td>
+                                <td class="border border-gray-300 px-4 py-2 font-mono">web_port</td>
+                                <td class="border border-gray-300 px-4 py-2">Web 服务监听端口。</td>
+                                <td class="border border-gray-300 px-4 py-2">5000</td>
                             </tr>
                             <tr>
-                                <td class="border border-gray-300 px-4 py-2 font-medium">邮件收件人</td>
-                                <td class="border border-gray-300 px-4 py-2">接收通知的邮箱,多个用逗号分隔</td>
-                                <td class="border border-gray-300 px-4 py-2">user@qq.com</td>
+                                <td class="border border-gray-300 px-4 py-2 font-mono">server_ip</td>
+                                <td class="border border-gray-300 px-4 py-2">用于生成“修复邮件”里的扫码链接（必须是收件人能访问到的地址）。</td>
+                                <td class="border border-gray-300 px-4 py-2">同局域网：192.168.x.x；本机：127.0.0.1</td>
                             </tr>
                             <tr class="bg-gray-50">
-                                <td class="border border-gray-300 px-4 py-2 font-medium">服务器IP</td>
-                                <td class="border border-gray-300 px-4 py-2">用于生成邮件中的扫码链接</td>
-                                <td class="border border-gray-300 px-4 py-2">192.168.1.xxx</td>
+                                <td class="border border-gray-300 px-4 py-2 font-mono">low_power_threshold</td>
+                                <td class="border border-gray-300 px-4 py-2">低电量阈值（度），低于该值发送告警邮件。</td>
+                                <td class="border border-gray-300 px-4 py-2">15</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2 font-mono">low_power_alert_cooldown_seconds</td>
+                                <td class="border border-gray-300 px-4 py-2">同一房间低电量告警冷却时间（秒），防止轰炸。</td>
+                                <td class="border border-gray-300 px-4 py-2">21600（6 小时）</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="border border-gray-300 px-4 py-2 font-mono">auth_sources</td>
+                                <td class="border border-gray-300 px-4 py-2">要轮询的 source 列表（逗号/分号/换行分隔）。</td>
+                                <td class="border border-gray-300 px-4 py-2">x3-721a,x3-721b,x3-721k</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">2) auth（Cookie/UA）与多 source</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">[auth]</code>：旧版单账号段（兼容）。</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">[auth.&lt;source&gt;]</code>：推荐使用的多账号段，每个 source 单独保存 <code class="bg-gray-200 px-2 py-1 rounded font-mono">cookie</code> 与 <code class="bg-gray-200 px-2 py-1 rounded font-mono">user_agent</code>。</li>
+                    <li>如果未设置 <code class="bg-gray-200 px-2 py-1 rounded font-mono">auth_sources</code> 且只配置了 <code class="bg-gray-200 px-2 py-1 rounded font-mono">[auth].cookie</code>，系统会进入 legacy 单源模式，避免重复轮询同一 Cookie。</li>
+                </ul>
+                <div class="code-block">
+                    <code>[auth.x3-721b]\ncookie = JSESSIONID=...\nuser_agent = Mozilla/5.0 ...</code>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">3) notify（邮件）与收件人策略</h3>
+                <p class="text-gray-700">
+                    系统支持三层收件人优先级（从高到低）：
+                </p>
+                <ol class="list-decimal list-inside text-gray-700 space-y-2 ml-4">
+                    <li><strong>按房间</strong>：<code class="bg-gray-200 px-2 py-1 rounded font-mono">[notify.rooms]</code></li>
+                    <li><strong>按 source 默认</strong>：<code class="bg-gray-200 px-2 py-1 rounded font-mono">[notify.sources]</code></li>
+                    <li><strong>回退到默认</strong>：<code class="bg-gray-200 px-2 py-1 rounded font-mono">[notify].to</code>（以及兼容旧模式的 group_a/group_b/group_k）</li>
+                </ol>
+                <div class="code-block">
+                    <code>[notify]\nsmtp_server = smtp.qq.com\nsmtp_port = 465\nsmtp_tls = ssl\nsmtp_username = your_email@qq.com\nsmtp_password = your_smtp_password\nfrom = your_email@qq.com\nto = a@example.com,b@example.com\n\n[notify.sources]\nx3-721b = a@example.com,b@example.com\n\n[notify.rooms]\n3-721B空调 = a@example.com</code>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">4) admin（管理员 Token）</h3>
+                <p class="text-gray-700">
+                    管理员 Token 用于保护配置/测试邮件/暂停监控等接口，后端通过请求头 <code class="bg-gray-200 px-2 py-1 rounded font-mono">X-Admin-Token</code> 校验。
+                </p>
+                <div class="code-block">
+                    <code>[admin]\nadmin_token = your_token_here</code>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">5) auth.labels（source 显示名称）</h3>
+                <p class="text-gray-700">用于把 source 显示成更易懂的中文名（仪表盘展示时更友好）：</p>
+                <div class="code-block">
+                    <code>[auth.labels]\nx3-721a = 琇3-721A\nx3-721b = 琇3-721B</code>
                 </div>
             </section>
 
             <!-- 常见问题 -->
             <section id="faq">
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
-                    <i class="fas fa-question-circle text-blue-500"></i> 常见问题
+                    <i class="fas fa-question-circle text-blue-500"></i> 常见问题/排障
                 </h2>
 
                 <div class="space-y-6 mt-6">
                     <div class="border-l-4 border-blue-500 pl-4">
                         <h3 class="font-bold text-gray-800">Q: Cookie多久会失效?</h3>
                         <p class="text-gray-700">A: 通常几天到一周,失效后系统会发邮件提醒,重新扫码即可。</p>
+                    </div>
+
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <h3 class="font-bold text-gray-800">Q: 运行 <span class="font-mono">python main.py</span> 直接退出(Exit Code 1)怎么办?</h3>
+                        <p class="text-gray-700">A: 常见原因与处理：</p>
+                        <ul class="list-disc list-inside ml-4 text-gray-700">
+                            <li>依赖缺失：先执行 <span class="font-mono">pip install -r requirements.txt</span></li>
+                            <li>Python 环境不一致：确认运行的是同一个 Python（建议在虚拟环境中安装依赖）</li>
+                            <li>端口被占用：修改 <span class="font-mono">config.ini</span> 中 <span class="font-mono">[system].web_port</span></li>
+                        </ul>
                     </div>
 
                     <div class="border-l-4 border-green-500 pl-4">
@@ -360,6 +499,8 @@
                             <li>收件人邮箱是否正确</li>
                             <li>检查垃圾邮件箱</li>
                             <li>点击"发送测试邮件"验证配置</li>
+                            <li>QQ邮箱等需要使用“SMTP授权码”，不是邮箱登录密码</li>
+                            <li>如果配置了 <span class="font-mono">[notify.rooms]</span>/<span class="font-mono">[notify.sources]</span>，收件人可能被更高优先级覆盖</li>
                         </ul>
                     </div>
 
@@ -368,15 +509,72 @@
                         <p class="text-gray-700">A: 可以!如果你的账号绑定了多个房间,系统会自动显示所有房间的电量。</p>
                     </div>
 
+                    <div class="border-l-4 border-yellow-500 pl-4">
+                        <h3 class="font-bold text-gray-800">Q: 什么是 source? 为什么要配置多个?</h3>
+                        <p class="text-gray-700">A: source 是“账号/宿舍”的逻辑标识。每个 source 对应一份 Cookie/UA（例如 <span class="font-mono">[auth.x3-721b]</span>）。系统会按 <span class="font-mono">[system].auth_sources</span> 轮询抓取并合并展示。</p>
+                    </div>
+
                     <div class="border-l-4 border-purple-500 pl-4">
                         <h3 class="font-bold text-gray-800">Q: 手动输入Cookie后没反应?</h3>
-                        <p class="text-gray-700">A: Cookie保存后需要等待下次检测周期(最多15分钟)才会生效,请耐心等待。</p>
+                        <p class="text-gray-700">A: Cookie 保存后会“请求立即刷新”，一般很快生效；如果仍无数据：</p>
+                        <ul class="list-disc list-inside ml-4 text-gray-700">
+                            <li>确认 Cookie 只需要 <span class="font-mono">JSESSIONID=...</span></li>
+                            <li>确认对应 source 正确（多 source 场景尤其常见）</li>
+                            <li>学校系统可能短暂 502/超时，稍后重试即可</li>
+                        </ul>
                     </div>
 
                     <div class="border-l-4 border-red-500 pl-4">
                         <h3 class="font-bold text-gray-800">Q: 显示"Cookie已失效"怎么办?</h3>
                         <p class="text-gray-700">A: 点击"扫码登录"或"手动输入"重新设置Cookie即可。</p>
                     </div>
+
+                    <div class="border-l-4 border-red-500 pl-4">
+                        <h3 class="font-bold text-gray-800">Q: 扫码页不出二维码 / 一直失败?</h3>
+                        <p class="text-gray-700">A: 这是 Selenium/Chrome 环境问题居多：</p>
+                        <ul class="list-disc list-inside ml-4 text-gray-700">
+                            <li>确认本机已安装 Chrome；或换用非精简系统环境</li>
+                            <li>公司/校园网可能拦截 webdriver 下载；可手动放置 <span class="font-mono">chromedriver.exe</span> 到项目目录</li>
+                            <li>二维码可能已过期：用 <span class="font-mono">/login?force=1</span> 重新生成</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API接口 -->
+            <section id="api">
+                <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
+                    <i class="fas fa-network-wired text-blue-500"></i> API接口
+                </h2>
+
+                <p class="text-gray-700 leading-relaxed">
+                    系统提供以 <code class="bg-gray-200 px-2 py-1 rounded font-mono">/api</code> 为前缀的 JSON 接口。部分接口需要管理员 Token：在请求头里带 <code class="bg-gray-200 px-2 py-1 rounded font-mono">X-Admin-Token: &lt;token&gt;</code>。
+                </p>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">公开接口</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">GET /api/status</code>：系统状态（监控是否运行、上次数据、sources 状态等）</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">GET /api/login-state</code>：扫码登录状态（不含二维码图片）</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">管理员接口（需要 X-Admin-Token）</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">GET /api/config</code>：读取配置（含敏感项，必须鉴权）</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">POST /api/config</code>：保存配置（interval/threshold/cooldown/收件人映射/auth_sources/auth_labels 等）</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">POST /api/test-email</code>：发送测试邮件（可选指定 to）</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">POST /api/toggle-monitoring</code>：暂停/恢复监控（body: {enabled: true/false}）</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">GET /api/admin/check</code>：是否已设置管理员 Token</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">POST /api/admin/setup</code>：首次设置管理员 Token</li>
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">POST /api/admin/login</code>：管理员登录</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-6">Cookie 相关接口</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li><code class="bg-gray-200 px-2 py-1 rounded font-mono">POST /api/manual-cookie</code>：手动设置某个 source 的 Cookie（body: {source, cookie, user_agent}）</li>
+                </ul>
+
+                <div class="code-block">
+                    <code>curl -H "X-Admin-Token: your_token" http://127.0.0.1:5000/api/config</code>
                 </div>
             </section>
 
@@ -388,19 +586,23 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 my-6">
                     <div class="bg-gray-100 p-4 rounded-lg text-center">
                         <i class="fab fa-python text-4xl text-blue-600 mb-2"></i>
-                        <p class="font-medium">Python 3.9</p>
+                        <p class="font-medium">Python 3.8+</p>
                     </div>
                     <div class="bg-gray-100 p-4 rounded-lg text-center">
                         <i class="fas fa-server text-4xl text-green-600 mb-2"></i>
                         <p class="font-medium">Flask</p>
                     </div>
                     <div class="bg-gray-100 p-4 rounded-lg text-center">
-                        <i class="fab fa-docker text-4xl text-blue-500 mb-2"></i>
-                        <p class="font-medium">Docker</p>
+                        <i class="fas fa-globe text-4xl text-sky-600 mb-2"></i>
+                        <p class="font-medium">Requests</p>
                     </div>
                     <div class="bg-gray-100 p-4 rounded-lg text-center">
                         <i class="fas fa-robot text-4xl text-purple-600 mb-2"></i>
                         <p class="font-medium">Selenium</p>
+                    </div>
+                    <div class="bg-gray-100 p-4 rounded-lg text-center">
+                        <i class="fas fa-leaf text-4xl text-emerald-600 mb-2"></i>
+                        <p class="font-medium">BeautifulSoup4</p>
                     </div>
                     <div class="bg-gray-100 p-4 rounded-lg text-center">
                         <i class="fab fa-js text-4xl text-yellow-500 mb-2"></i>
@@ -418,9 +620,9 @@
                 <h3 class="text-2xl font-bold mb-2">
                     <i class="fas fa-hands-helping mr-2"></i>需要帮助?
                 </h3>
-                <p class="mb-4">如果遇到问题,可以查看日志或重启容器</p>
+                <p class="mb-4">如果遇到问题,建议先查看运行日志（终端输出）并确认配置是否生效</p>
                 <div class="code-block text-left">
-                    <code># 查看日志<br>docker logs -f dorm_monitor<br><br># 重启容器<br>docker-compose restart</code>
+                    <code># 安装依赖（首次）<br>pip install -r requirements.txt<br><br># 启动服务<br>python main.py</code>
                 </div>
             </div>
 
