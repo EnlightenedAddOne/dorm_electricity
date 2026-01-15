@@ -99,9 +99,9 @@
         </div>
         <div class="p-4 overflow-y-auto flex-1">
              <ul class="space-y-1">
-                <li><a @click="sidebarOpen = false" href="#intro" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">项目简�?/a></li>
-                <li><a @click="sidebarOpen = false" href="#features" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">功能特�?/a></li>
-                <li><a @click="sidebarOpen = false" href="#quick-start" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">快速开�?/a></li>
+            <li><a @click="sidebarOpen = false" href="#intro" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">项目简介</a></li>
+            <li><a @click="sidebarOpen = false" href="#features" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">功能特性</a></li>
+            <li><a @click="sidebarOpen = false" href="#quick-start" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">快速开始</a></li>
                 <li><a @click="sidebarOpen = false" href="#cookie-guide" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">Cookie教程</a></li>
                 <li><a @click="sidebarOpen = false" href="#config" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">配置说明</a></li>
                 <li><a @click="sidebarOpen = false" href="#faq" class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-medium">常见问题</a></li>
@@ -121,9 +121,9 @@
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-list-ul mr-2 text-blue-500"></i> 目录</h2>
                 <ul class="space-y-1">
-                    <li><a href="#intro" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">项目简�?/a></li>
-                    <li><a href="#features" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">功能特�?/a></li>
-                    <li><a href="#quick-start" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">快速开�?/a></li>
+                    <li><a href="#intro" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">项目简介</a></li>
+                    <li><a href="#features" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">功能特性</a></li>
+                    <li><a href="#quick-start" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">快速开始</a></li>
                     <li><a href="#cookie-guide" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">Cookie教程</a></li>
                     <li><a href="#config" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">配置说明</a></li>
                     <li><a href="#faq" class="block py-2 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">常见问题</a></li>
@@ -132,32 +132,37 @@
             </div>
         </aside>
 
-        <!-- 内容�?-->
+        <!-- 内容 -->
         <main class="flex-1 min-w-0">
             <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 prose prose-blue max-w-none">
             
-            <!-- 项目简�?-->
+            <!-- 项目简介 -->
             <section id="intro">
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2">
-                    <i class="fas fa-info-circle text-blue-500"></i> 项目简�?                </h2>
+                    <i class="fas fa-info-circle text-blue-500"></i> 项目简介
+                </h2>
                 <p class="text-gray-700 leading-relaxed">
-                    <strong>宿舍电费监控系统</strong>是一个自动化监控工具,定期检测校园宿舍剩余电量并在电量不足时发送邮件提醒�?                    系统采用Docker容器化部�?支持多房间监�?提供友好的Web管理界面�?                </p>
+                    <strong>宿舍电费监控系统</strong>是一个自动化监控工具，定期检测校园宿舍剩余电量，并在电量不足时发送邮件提醒。系统支持 Docker 容器化部署，支持多房间监控，并提供友好的 Web 管理界面。
+                </p>
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-4">
                     <p class="text-blue-800">
                         <i class="fas fa-lightbulb mr-2"></i>
-                        <strong>适用场景:</strong> 适合需要实时掌握宿舍电费状态的学生,避免突然断电影响学习生活�?                    </p>
+                        <strong>适用场景:</strong> 适合需要实时掌握宿舍电费状态的学生，避免突然断电影响学习生活。
+                    </p>
                 </div>
             </section>
 
-            <!-- 功能特�?-->
+            <!-- 功能特性 -->
             <section id="features">
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
-                    <i class="fas fa-star text-blue-500"></i> 功能特�?                </h2>
+                    <i class="fas fa-star text-blue-500"></i> 功能特性
+                </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
                     <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                         <h3 class="font-bold text-blue-800 mb-2">
-                            <i class="fas fa-robot mr-2"></i>自动化监�?                        </h3>
-                        <p class="text-sm text-gray-700">定时自动检测电�?无需手动操作</p>
+                            <i class="fas fa-robot mr-2"></i>自动化监控
+                        </h3>
+                        <p class="text-sm text-gray-700">定时自动检测电量，无需手动操作</p>
                     </div>
                     <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                         <h3 class="font-bold text-green-800 mb-2">
@@ -167,29 +172,31 @@
                     </div>
                     <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                         <h3 class="font-bold text-purple-800 mb-2">
-                            <i class="fas fa-mobile-alt mr-2"></i>响应式界�?                        </h3>
+                            <i class="fas fa-mobile-alt mr-2"></i>响应式界面
+                        </h3>
                         <p class="text-sm text-gray-700">支持手机/平板/电脑访问</p>
                     </div>
                     <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                         <h3 class="font-bold text-yellow-800 mb-2">
                             <i class="fas fa-cubes mr-2"></i>Docker部署
                         </h3>
-                        <p class="text-sm text-gray-700">支持Docker容器化部署，简化安装维�?/p>
+                        <p class="text-sm text-gray-700">支持 Docker 容器化部署，简化安装维护。</p>
                     </div>
                 </div>
             </section>
 
-            <!-- 快速开�?-->
+            <!-- 快速开始 -->
             <section id="quick-start">
                 <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mt-8">
-                    <i class="fas fa-rocket text-blue-500"></i> 快速开�?                </h2>
+                    <i class="fas fa-rocket text-blue-500"></i> 快速开始
+                </h2>
                 
                 <h3 class="text-xl font-semibold text-gray-800 mt-6">
                     <span class="step-number">1</span>登录系统
                 </h3>
-                <p class="text-gray-700">有两种方式登�?</p>
+                <p class="text-gray-700">有两种方式登录：</p>
                 <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
-                    <li><strong>扫码登录(推荐)</strong>: 点击"扫码登录"按钮,使用微信扫描二维�?/li>
+                    <li><strong>扫码登录(推荐)</strong>: 点击"扫码登录"按钮，使用微信扫描二维码</li>
                     <li><strong>手动输入</strong>: 点击"手动输入"按钮,粘贴从浏览器获取的Cookie</li>
                 </ul>
 
@@ -198,16 +205,17 @@
                 </h3>
                 <p class="text-gray-700">进入"配置"页面,设置以下参数:</p>
                 <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
-                    <li><strong>检测间�?/strong>: 建议900�?15分钟)</li>
-                    <li><strong>低电量阈�?/strong>: 建议15�?/li>
-                    <li><strong>邮件收件�?/strong>: 填写接收通知的邮箱地址</li>
+                    <li><strong>检测间隔</strong>: 建议 900 秒（15 分钟）</li>
+                    <li><strong>低电量阈值</strong>: 建议 15 度</li>
+                    <li><strong>邮件收件人</strong>: 填写接收通知的邮箱地址</li>
                 </ul>
 
                 <h3 class="text-xl font-semibold text-gray-800 mt-6">
                     <span class="step-number">3</span>测试邮件
                 </h3>
                 <p class="text-gray-700">
-                    点击"发送测试邮�?按钮,确认邮件配置正常。如果收到测试邮�?说明系统配置成功�?                </p>
+                    点击“发送测试邮件”按钮，确认邮件配置正常。如果收到测试邮件，说明系统配置成功。
+                </p>
             </section>
 
             <!-- Cookie获取教程 -->
@@ -224,25 +232,26 @@
                 </div>
 
                 <div class="space-y-8 mt-6">
-                    <!-- 电脑�?-->
+                    <!-- 电脑端 -->
                     <div>
                         <h3 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
-                            <i class="fas fa-desktop text-gray-500 mr-2"></i>电脑�?                        </h3>
+                            <i class="fas fa-desktop text-gray-500 mr-2"></i>电脑端
+                        </h3>
 
                         <!-- 方法1 -->
                         <div class="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
                             <h4 class="text-lg font-bold text-blue-600 mb-3">方法1: 提取链接后缀 (推荐)</h4>
                             <ol class="list-decimal list-outside text-gray-700 space-y-6 ml-4">
                                 <li>
-                                    <p class="mb-2">使用浏览器访�?<a href="http://ids.lit.edu.cn/authserver/login?service=http%3A%2F%2Fzhyd.sec.lit.edu.cn%2Fzhyd%2Fsydl%2Findex" target="_blank" class="text-blue-500 hover:underline font-medium">统一身份认证</a> 进行登录�?/p>
+                                    <p class="mb-2">使用浏览器访问 <a href="http://ids.lit.edu.cn/authserver/login?service=http%3A%2F%2Fzhyd.sec.lit.edu.cn%2Fzhyd%2Fsydl%2Findex" target="_blank" class="text-blue-500 hover:underline font-medium">统一身份认证</a> 进行登录。</p>
                                     <img src="help_img/login_page.png" alt="登录界面" class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
                                 </li>
                                 <li>
-                                    <p class="mb-2">成功登录后的界面如下�?/p>
+                                    <p class="mb-2">成功登录后的界面如下：</p>
                                     <img src="help_img/login_success.png" alt="成功登录界面" class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
                                 </li>
                                 <li>
-                                    <p class="mb-2">复制地址栏中�?<code class="bg-gray-200 px-2 py-1 rounded text-red-500 font-mono">JSESSIONID=xxxxxxxxx</code> 部分�?/p>
+                                    <p class="mb-2">复制地址栏中的 <code class="bg-gray-200 px-2 py-1 rounded text-red-500 font-mono">JSESSIONID=xxxxxxxxx</code> 部分。</p>
                                     <img src="help_img/url_jsessionid.png" alt="复制 JSESSIONID" class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
                                 </li>
                             </ol>
@@ -250,40 +259,43 @@
 
                         <!-- 方法2 -->
                         <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                            <h4 class="text-lg font-bold text-blue-600 mb-3">方法2: 使用开发者工�?/h4>
+                            <h4 class="text-lg font-bold text-blue-600 mb-3">方法2: 使用开发者工具</h4>
                             <ol class="list-decimal list-outside text-gray-700 space-y-6 ml-4">
-                                <li>参考方法一进行登录�?/li>
+                                <li>参考方法一进行登录。</li>
                                 <li>
-                                    <p class="mb-2">�?<kbd class="bg-white border border-gray-300 px-2 py-1 rounded text-sm text-gray-500 font-mono shadow-sm">F12</kbd> 打开开发者工具�?/p>
-                                    <img src="help_img/dev_tools_f12.png" alt="F12 开发者工�? class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
+                                    <p class="mb-2">按 <kbd class="bg-white border border-gray-300 px-2 py-1 rounded text-sm text-gray-500 font-mono shadow-sm">F12</kbd> 打开开发者工具。</p>
+                                    <img src="help_img/dev_tools_f12.png" alt="F12 开发者工具" class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
                                 </li>
                                 <li>
-                                    <p class="mb-2">切换�?<strong>Network (网络)</strong> 选项卡�?/p>
-                                    <img src="help_img/network_tab.png" alt="Network 选项�? class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
+                                    <p class="mb-2">切换到 <strong>Network（网络）</strong> 选项卡。</p>
+                                    <img src="help_img/network_tab.png" alt="Network 选项卡" class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
                                 </li>
-                                <li>刷新页面 (<kbd class="bg-white border border-gray-300 px-2 py-1 rounded text-sm text-gray-500 font-mono shadow-sm">F5</kbd>)�?/li>
+                                <li>刷新页面（<kbd class="bg-white border border-gray-300 px-2 py-1 rounded text-sm text-gray-500 font-mono shadow-sm">F5</kbd>）</li>
                                 <li>
-                                    <p class="mb-2">点击任意请求，在右侧找到 <strong>Request Headers (请求�?</strong>，找�?<code class="bg-gray-200 px-2 py-1 rounded font-mono">Cookie:</code> 字段，复制其中的 <code class="bg-gray-200 px-2 py-1 rounded text-red-500 font-mono">JSESSIONID=xxxxxxxxx</code> 部分�?/p>
+                                    <p class="mb-2">点击任意请求，在右侧找到 <strong>Request Headers（请求头）</strong>，找到 <code class="bg-gray-200 px-2 py-1 rounded font-mono">Cookie:</code> 字段，复制其中的 <code class="bg-gray-200 px-2 py-1 rounded text-red-500 font-mono">JSESSIONID=xxxxxxxxx</code> 部分。</p>
                                     <img src="help_img/header_cookie.png" alt="复制 Cookie 中的 JSESSIONID" class="rounded-lg shadow-md border max-w-full md:max-w-lg hover:shadow-xl transition-shadow duration-300 cursor-zoom-in" @click="zoomedImage = $el.src">
                                 </li>
                             </ol>
                         </div>
                     </div>
 
-                    <!-- 手机�?-->
+                    <!-- 手机端 -->
                     <div>
                         <h3 class="text-2xl font-bold text-gray-800 flex items-center mb-4">
-                            <i class="fas fa-mobile-alt text-gray-500 mr-2"></i>手机�?                        </h3>
+                            <i class="fas fa-mobile-alt text-gray-500 mr-2"></i>手机端
+                        </h3>
                         <p class="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
                             <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-                            建议使用 <strong>电脑端的方法一</strong> 获取，因为手机端浏览器通常无法方便地使用开发者工具查�?Cookie�?                        </p>
+                            建议使用 <strong>电脑端的方法一</strong> 获取，因为手机端浏览器通常无法方便地使用开发者工具查询 Cookie。
+                        </p>
                     </div>
                 </div>
 
                 <div class="bg-gray-100 p-4 rounded-lg mt-8 text-sm text-gray-600">
                     <p>
                         <i class="fas fa-info-circle mr-2"></i>
-                        <strong>格式说明:</strong> Cookie 格式�?<code class="bg-white px-2 py-1 rounded font-mono border">JSESSIONID=一串字母数�?/code>�?                        如果只复制了后面的值，系统会自动补全前缀�?                    </p>
+                        <strong>格式说明:</strong> Cookie 格式为 <code class="bg-white px-2 py-1 rounded font-mono border">JSESSIONID=一串字母数字</code>。如果只复制了后面的值，系统会自动补全前缀。
+                    </p>
                 </div>
             </section>
 
@@ -297,25 +309,25 @@
                     <table class="min-w-full border border-gray-300">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="border border-gray-300 px-4 py-2 text-left">配置�?/th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">配置项</th>
                                 <th class="border border-gray-300 px-4 py-2 text-left">说明</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">推荐�?/th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">推荐值</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm">
                             <tr>
-                                <td class="border border-gray-300 px-4 py-2 font-medium">检测间�?/td>
-                                <td class="border border-gray-300 px-4 py-2">每次检测的时间间隔(�?</td>
+                                <td class="border border-gray-300 px-4 py-2 font-medium">检测间隔</td>
+                                <td class="border border-gray-300 px-4 py-2">每次检测的时间间隔（秒）</td>
                                 <td class="border border-gray-300 px-4 py-2">900(15分钟)</td>
                             </tr>
                             <tr class="bg-gray-50">
-                                <td class="border border-gray-300 px-4 py-2 font-medium">低电量阈�?/td>
-                                <td class="border border-gray-300 px-4 py-2">低于此值发送邮�?�?</td>
-                                <td class="border border-gray-300 px-4 py-2">15�?/td>
+                                <td class="border border-gray-300 px-4 py-2 font-medium">低电量阈值</td>
+                                <td class="border border-gray-300 px-4 py-2">低于此值发送邮件提醒</td>
+                                <td class="border border-gray-300 px-4 py-2">15 度</td>
                             </tr>
                             <tr>
-                                <td class="border border-gray-300 px-4 py-2 font-medium">邮件收件�?/td>
-                                <td class="border border-gray-300 px-4 py-2">接收通知的邮�?多个用逗号分隔</td>
+                                <td class="border border-gray-300 px-4 py-2 font-medium">邮件收件人</td>
+                                <td class="border border-gray-300 px-4 py-2">接收通知的邮箱，多个用逗号分隔</td>
                                 <td class="border border-gray-300 px-4 py-2">user@qq.com</td>
                             </tr>
                             <tr class="bg-gray-50">
@@ -336,33 +348,33 @@
 
                 <div class="space-y-6 mt-6">
                     <div class="border-l-4 border-blue-500 pl-4">
-                        <h3 class="font-bold text-gray-800">Q: Cookie多久会失�?</h3>
-                        <p class="text-gray-700">A: 通常几天到一�?失效后系统会发邮件提�?重新扫码即可�?/p>
+                        <h3 class="font-bold text-gray-800">Q: Cookie 多久会失效？</h3>
+                        <p class="text-gray-700">A: 通常几天到一周。失效后系统会发邮件提示，重新扫码即可。</p>
                     </div>
 
                     <div class="border-l-4 border-green-500 pl-4">
                         <h3 class="font-bold text-gray-800">Q: 为什么没收到邮件通知?</h3>
-                        <p class="text-gray-700">A: 请检�?</p>
+                        <p class="text-gray-700">A: 请检查：</p>
                         <ul class="list-disc list-inside ml-4 text-gray-700">
-                            <li>收件人邮箱是否正�?/li>
+                            <li>收件人邮箱是否正确</li>
                             <li>检查垃圾邮件箱</li>
-                            <li>点击"发送测试邮�?验证配置</li>
+                            <li>点击“发送测试邮件”验证配置</li>
                         </ul>
                     </div>
 
                     <div class="border-l-4 border-yellow-500 pl-4">
-                        <h3 class="font-bold text-gray-800">Q: 可以监控多个房间�?</h3>
-                        <p class="text-gray-700">A: 可以!如果你的账号绑定了多个房�?系统会自动显示所有房间的电量�?/p>
+                        <h3 class="font-bold text-gray-800">Q: 可以监控多个房间吗？</h3>
+                        <p class="text-gray-700">A: 可以！如果你的账号绑定了多个房间，系统会自动显示所有房间的电量。</p>
                     </div>
 
                     <div class="border-l-4 border-purple-500 pl-4">
                         <h3 class="font-bold text-gray-800">Q: 手动输入Cookie后没反应?</h3>
-                        <p class="text-gray-700">A: Cookie保存后需要等待下次检测周�?最�?5分钟)才会生效,请耐心等待�?/p>
+                        <p class="text-gray-700">A: Cookie 保存后需要等待下一次检测周期才会生效，请耐心等待。</p>
                     </div>
 
                     <div class="border-l-4 border-red-500 pl-4">
-                        <h3 class="font-bold text-gray-800">Q: 显示"Cookie已失�?怎么�?</h3>
-                        <p class="text-gray-700">A: 点击"扫码登录"�?手动输入"重新设置Cookie即可�?/p>
+                        <h3 class="font-bold text-gray-800">Q: 显示“Cookie 已失效”怎么办？</h3>
+                        <p class="text-gray-700">A: 点击“扫码登录”或“手动输入”，重新设置 Cookie 即可。</p>
                     </div>
                 </div>
             </section>
@@ -403,9 +415,9 @@
             <!-- 联系支持 -->
             <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white text-center mt-8">
                 <h3 class="text-2xl font-bold mb-2">
-                    <i class="fas fa-hands-helping mr-2"></i>需要帮�?
+                    <i class="fas fa-hands-helping mr-2"></i>需要帮助？
                 </h3>
-                <p class="mb-4">如果遇到问题,可以查看日志或重启容�?/p>
+                <p class="mb-4">如果遇到问题，可以查看日志或重启容器。</p>
                 <div class="code-block text-left">
                     <code># 查看日志<br>docker logs -f dorm_monitor<br><br># 重启容器<br>docker-compose restart</code>
                 </div>
