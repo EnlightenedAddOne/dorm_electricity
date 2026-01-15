@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>宿舍电费监控系统（dorm_electricity）</title>
+  <meta name="description" content="dorm_electricity：宿舍电费/余额监控与告警系统，支持多账号轮询、扫码更新 Cookie、邮件告警与仪表盘展示。" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <style>
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.25) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    @keyframes fade-in-up {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-up {
+      opacity: 0;
+      animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-700 { animation-delay: 0.7s; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+  <!-- Top Nav -->
+  <header class="absolute top-0 z-50 w-full">
+    <div class="mx-auto max-w-7xl px-4 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <i class="fas fa-bolt"></i>
+        </span>
+        <div class="leading-tight">
+          <div class="font-semibold tracking-tight group-hover:text-slate-900">宿舍电费监控</div>
+          <div class="text-xs text-slate-400">洛阳理工学院专版</div>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <a href="https://github.com/EnlightenedAddOne/dorm_electricity/tree/main" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition">
+          <i class="fab fa-github"></i>
+          <span>GitHub</span>
+        </a>
+        <a href="/help/help.html" class="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-medium transition">
+          <i class="fas fa-book"></i>
+          <span>查看文档</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute -top-32 -left-32 w-[520px] h-[520px] bg-sky-500/15 blur-3xl rounded-full"></div>
+    <div class="absolute -bottom-40 -right-40 w-[640px] h-[640px] bg-indigo-500/15 blur-3xl rounded-full"></div>
+
+    <div class="relative mx-auto max-w-7xl px-4 pt-16 pb-10 sm:pt-20 sm:pb-14">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="mt-6 text-4xl sm:text-6xl font-bold tracking-tight animate-up">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-indigo-500 to-sky-600">DormPower</span>
+          <span class="block mt-3 text-xl sm:text-2xl font-medium text-slate-600">智能宿舍电量监控系统</span>
+        </h1>
+
+        <p class="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed animate-up delay-100">
+          自动轮询电量余额、微信扫码登录、低电量邮件提醒，让你不再担心突然断电影响学习生活。
+        </p>
+
+        <div class="mt-10 flex items-center justify-center gap-6 text-sm text-slate-500 animate-up delay-200">
+          <div class="flex items-center gap-2"><i class="fas fa-user-shield text-slate-500"></i>管理员 Token 鉴权</div>
+          <div class="flex items-center gap-2"><i class="fas fa-envelope text-slate-500"></i>SMTP 邮件通知</div>
+          <div class="flex items-center gap-2"><i class="fas fa-layer-group text-slate-500"></i>source 合并展示</div>
+        </div>
+      </div>
+
+      <!-- Hero cards -->
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 animate-up delay-300">
+        <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold">低电量告警</div>
+            <i class="fas fa-battery-quarter text-amber-300"></i>
+          </div>
+          <p class="mt-2 text-sm text-slate-600">低于阈值自动发邮件，并带冷却时间，避免轰炸。</p>
+          <a class="mt-4 inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700" href="/help/help.html#config">
+            <span>查看阈值配置</span><i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold">Cookie 失效提醒</div>
+            <i class="fas fa-triangle-exclamation text-rose-300"></i>
+          </div>
+          <p class="mt-2 text-sm text-slate-600">连续失败后自动发送修复邮件，邮件内包含扫码链接。</p>
+          <a class="mt-4 inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700" href="/help/help.html#cookie-guide">
+            <span>查看 Cookie 教程</span><i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold">Docker 部署</div>
+            <i class="fab fa-docker text-sky-600"></i>
+          </div>
+          <p class="mt-2 text-sm text-slate-600">镜像内置 Chromium + driver + 字体，适配 headless 扫码。</p>
+          <a class="mt-4 inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700" href="/help/help.html#quick-start">
+            <span>查看部署步骤</span><i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="mx-auto max-w-7xl px-4 py-14 animate-up delay-500">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl sm:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600 inline-block">项目亮点</h2>
+      <div class="mt-2 text-slate-500 font-medium">Features</div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm">
+        <div class="text-sm font-semibold flex items-center gap-2"><i class="fas fa-layer-group text-indigo-300"></i>多 source 轮询</div>
+        <p class="mt-2 text-sm text-slate-600">每个 source 独立 Cookie/UA，监控线程合并数据并统一展示。</p>
+      </div>
+      <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm">
+        <div class="text-sm font-semibold flex items-center gap-2"><i class="fas fa-user-shield text-emerald-300"></i>管理员鉴权</div>
+        <p class="mt-2 text-sm text-slate-600">配置/测试邮件/暂停监控等接口需要管理员 Token，降低误操作风险。</p>
+      </div>
+      <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm">
+        <div class="text-sm font-semibold flex items-center gap-2"><i class="fas fa-shield-halved text-sky-300"></i>防轰炸策略</div>
+        <p class="mt-2 text-sm text-slate-600">低电量告警冷却，网络/服务器异常自动退避重试。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="mt-20">
+    <div class="mx-auto max-w-7xl px-4 py-12 flex flex-col items-center justify-center gap-4 animate-up delay-700">
+      <div class="text-sm text-slate-500 flex flex-col items-center gap-2">
+        <div class="font-semibold text-slate-900 flex items-center gap-2">
+          <span>DormPower</span>
+          <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">洛理工专版</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span>© 2026 by Addone</span>
+          <a href="https://github.com/EnlightenedAddOne/dorm_electricity/tree/main" target="_blank" class="inline-flex items-center gap-1 text-slate-600 hover:text-slate-900 transition">
+            <i class="fab fa-github"></i>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

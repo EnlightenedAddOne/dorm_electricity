@@ -1,6 +1,7 @@
 {
   "redirects": [
-    { "source": "/", "destination": "/help/", "permanent": false },
-    { "source": "/help", "destination": "/help/", "permanent": false }
+    { "source": "/help", "destination": "/help/help.html", "permanent": false },
+    { "source": "/help/", "destination": "/help/help.html", "permanent": false },
+    { "source": "/help.html", "destination": "/help/help.html", "permanent": false }
   ]
 }
