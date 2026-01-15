@@ -376,6 +376,18 @@
                     </p>
                 </div>
 
+                <!-- 扫码流程演示图 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+                    <div class="space-y-2">
+                        <div class="text-center font-medium text-gray-600 text-sm">1. 访问登录页出现二维码</div>
+                        <img src="../Display_img/扫码界面.png" alt="扫码登录界面" class="rounded-lg shadow-md border hover:shadow-xl transition-shadow duration-300 w-full cursor-zoom-in" @click="zoomedImage = $el.src">
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-center font-medium text-gray-600 text-sm">2. 手机扫码后自动跳转成功页</div>
+                        <img src="../Display_img/扫码成功.png" alt="登录成功界面" class="rounded-lg shadow-md border hover:shadow-xl transition-shadow duration-300 w-full cursor-zoom-in" @click="zoomedImage = $el.src">
+                    </div>
+                </div>
+
                 <!-- 方式二：手动 -->
                 <h3 class="text-2xl font-bold text-gray-800 mt-10 mb-4 border-t border-gray-200 pt-8 flex items-center">
                     <span class="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg text-base mr-3">方式二</span>

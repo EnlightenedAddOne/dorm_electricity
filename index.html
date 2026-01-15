@@ -6,6 +6,7 @@
   <title>宿舍电费监控系统（dorm_electricity）</title>
   <meta name="description" content="dorm_electricity：宿舍电费/余额监控与告警系统，支持多账号轮询、扫码更新 Cookie、邮件告警与仪表盘展示。" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
   <style>
@@ -136,6 +137,67 @@
       <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm">
         <div class="text-sm font-semibold flex items-center gap-2"><i class="fas fa-shield-halved text-sky-300"></i>防轰炸策略</div>
         <p class="mt-2 text-sm text-slate-600">低电量告警冷却，网络/服务器异常自动退避重试。</p>
+      </div>
+    </div>
+
+    <!-- Interface Preview -->
+    <div class="mt-24 animate-up delay-700">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600 inline-block">界面预览</h2>
+        <div class="mt-2 text-slate-500 font-medium">Preview</div>
+      </div>
+      
+      <div x-data="{ 
+            active: 0, 
+            slides: [
+              'Display_img/首页01.png', 
+              'Display_img/首页02.png',
+              'Display_img/配置01.png',
+              'Display_img/扫码界面.png'
+            ],
+            next() { this.active = (this.active + 1) % this.slides.length },
+            prev() { this.active = (this.active - 1 + this.slides.length) % this.slides.length },
+            timer: null,
+            startAuto() { this.timer = setInterval(() => this.next(), 3000) },
+            stopAuto() { clearInterval(this.timer) }
+           }" 
+           x-init="startAuto()"
+           @mouseenter="stopAuto()" 
+           @mouseleave="startAuto()"
+           class="relative mx-auto max-w-4xl rounded-2xl bg-white p-2 shadow-2xl ring-1 ring-slate-900/10 sm:p-3">
+        
+        <!-- Image Container -->
+        <div class="relative overflow-hidden rounded-xl bg-slate-50 aspect-[16/10]">
+            <template x-for="(slide, index) in slides" :key="index">
+                <img :src="slide" 
+                     x-show="active === index"
+                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     x-transition:leave="transition ease-in duration-500"
+                     x-transition:leave-start="opacity-100 transform scale-100"
+                     x-transition:leave-end="opacity-0 transform scale-95"
+                     class="absolute inset-0 w-full h-full object-contain" 
+                     alt="Preview" />
+            </template>
+            
+            <!-- Controls -->
+            <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg transition backdrop-blur-sm z-10">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg transition backdrop-blur-sm z-10">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <!-- Indicators -->
+            <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10">
+                <template x-for="(slide, index) in slides" :key="index">
+                    <button @click="active = index" 
+                            :class="active === index ? 'bg-sky-500 w-6' : 'bg-slate-300 w-2'"
+                            class="h-2 rounded-full transition-all duration-300 shadow-sm"></button>
+                </template>
+            </div>
+        </div>
       </div>
     </div>
   </section>
