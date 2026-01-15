@@ -2,5 +2,25 @@
   "redirects": [
     { "source": "/", "destination": "/help/", "permanent": false },
     { "source": "/help", "destination": "/help/", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/help",
+      "headers": [
+        { "key": "Content-Type", "value": "text/html; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/help/",
+      "headers": [
+        { "key": "Content-Type", "value": "text/html; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/help/index.html",
+      "headers": [
+        { "key": "Content-Type", "value": "text/html; charset=utf-8" }
+      ]
+    }
   ]
 }
