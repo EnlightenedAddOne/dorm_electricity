@@ -5,7 +5,7 @@ import os
 import sys
 import threading
 import urllib3
-from flask import Flask, render_template, jsonify, send_from_directory, request
+from flask import Flask, render_template, jsonify, send_from_directory, request, redirect
 
 # 确保无论从哪个工作目录启动，都能导入本项目同目录下的模块（config/api/monitor/auth 等）
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -43,10 +43,7 @@ def dashboard():
 @app.route('/help', strict_slashes=False)
 def help_page():
     """帮助文档"""
-    try:
-        return send_from_directory(STATIC_DIR, 'help.html', max_age=0)
-    except:
-        return "<h1>404</h1><p>help.html not found in static/</p>", 404
+    return redirect("https://dorm-electricity.pages.dev/")
 
 
 @app.route('/login')
@@ -91,8 +88,13 @@ if __name__ == '__main__':
     # 启动Web服务
     cfg = Config()
     port = cfg.get_int("system", "web_port", 5000)
+    
+    # 获取显示的IP地址（优先使用配置的server_ip，否则使用localhost）
+    server_ip = cfg.get("system", "server_ip")
+    display_host = server_ip if server_ip else "127.0.0.1"
+
     logger.info(f"🚀 Web服务启动: http://0.0.0.0:{port}")
-    logger.info(f"📱 管理面板: http://0.0.0.0:{port}/")
-    logger.info(f"📖 帮助文档: http://0.0.0.0:{port}/help")
+    logger.info(f"📱 管理面板: http://{display_host}:{port}/")
+    logger.info(f"📖 帮助文档: https://dorm-electricity.pages.dev/")
     
     app.run(host='0.0.0.0', port=port, debug=False)
