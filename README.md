@@ -2,7 +2,7 @@
 
 一个面向校园宿舍场景的电费/余额监控工具：定时抓取电量页面，支持微信扫码自动更新 Cookie，多账号（多 source）轮询合并展示，并在低电量或 Cookie 失效时发送邮件告警。
 
-项目展示页：[宿舍电费监控系统](https://dorm-electricity-74yvc37za-addones-projects.vercel.app/)
+项目展示页：[宿舍电费监控系统](https://dorm-electricity.pages.dev/)
 
 ## 目录
 
