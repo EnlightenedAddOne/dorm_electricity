@@ -35,4 +35,6 @@ COPY . .
 EXPOSE 5000
 
 # 5. 启动命令
-CMD ["python", "main.py"]
+# CMD ["python", "main.py"]
+CMD ["python", "app/main.py"]
+# CMD ["python", "run.py"]

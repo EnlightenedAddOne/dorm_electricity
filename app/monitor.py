@@ -9,6 +9,7 @@ import unicodedata
 from bs4 import BeautifulSoup
 from datetime import datetime
 from config import Config, logger
+from power_db import init_db, get_db
 
 # 目标URL
 TARGET_URL = "http://zhyd.sec.lit.edu.cn/zhyd/sydl/index"
@@ -255,6 +256,9 @@ def monitor_task():
     global system_status
     logger.info("⏱️ 监控线程已启动")
 
+    # 初始化数据库（如首次运行自动建表）
+    init_db()
+
     # 记录每个 source 的告警/修复邮件时间，防止轰炸
     last_repair_email_time = {}
 
@@ -325,6 +329,30 @@ def monitor_task():
                     d2["meter_type"] = classify_meter(room_text, cfg=cfg)
                     enriched.append(d2)
                 ok_lists.append(enriched)
+
+                # === 写入power_log表 ===
+                now = datetime.now()
+                date_str = now.strftime("%Y-%m-%d")
+                time_str = now.strftime("%H:%M:%S")
+                try:
+                    conn = get_db()
+                    for d in data:
+                        room = str(d.get("room") or "")
+                        remain_power = d.get("kwh")
+                        try:
+                            remain_power = float(remain_power)
+                        except Exception:
+                            remain_power = None
+                        if not room or remain_power is None:
+                            continue
+                        conn.execute(
+                            "INSERT INTO power_log (source, date, time, remain_power) VALUES (?, ?, ?, ?)",
+                            (s, date_str, time_str, remain_power)
+                        )
+                    conn.commit()
+                    conn.close()
+                except Exception as e:
+                    logger.error(f"[power_log] 数据写入失败: {e}")
 
                 # 记录该 source 最近一次成功抓到的房间，用于后续 cookie 失效时定向通知
                 try:
