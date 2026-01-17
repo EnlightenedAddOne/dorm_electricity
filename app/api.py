@@ -1,3 +1,32 @@
+from flask import Blueprint, request, jsonify
+from power_db import get_db
+from datetime import datetime, timedelta
+
+api = Blueprint('api', __name__)
+
+# ...existing code...
+
+# 获取指定房间过去7天耗电数据
+@api.route('/api/room_power_trend')
+def room_power_trend():
+    room = request.args.get('room')
+    if not room:
+        return jsonify({'error': 'room参数缺失'}), 400
+    today = datetime.now().date()
+    days = [(today - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(6, -1, -1)]
+    conn = get_db()
+    try:
+        sql = '''
+            SELECT date, consume_power FROM power_daily
+            WHERE room=? AND date BETWEEN ? AND ?
+            ORDER BY date
+        '''
+        rows = conn.execute(sql, (room, days[0], days[-1])).fetchall()
+        data = {r['date']: r['consume_power'] for r in rows}
+        result = [{'date': d, 'consume_power': float(data.get(d, 0))} for d in days]
+        return jsonify({'room': room, 'trend': result})
+    finally:
+        conn.close()
 """
 API路由模块 - 提供RESTful API接口 (已添加权限控制)
 """

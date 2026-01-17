@@ -8,6 +8,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         [x-cloak] { display: none !important; }
         .mobile-nav { display: none; }
@@ -203,8 +204,8 @@
                             <i class="fas fa-door-closed text-slate-400 mr-2"></i>
                             <span x-text="room.room"></span>
                         </h3>
-                        <button class="text-slate-300 hover:text-blue-500 transition">
-                            <i class="fas fa-ellipsis-h"></i>
+                        <button class="text-blue-400 hover:text-blue-600 transition flex items-center text-xs font-semibold" @click.stop="openPowerTrend(room.room, $event)">
+                            <i class="fas fa-chart-line mr-1"></i>趋势
                         </button>
                     </div>
                     <div class="p-5">
@@ -235,6 +236,17 @@
                 <p class="text-slate-600 text-lg font-medium">暂无房间数据</p>
                 <p class="text-slate-400 text-sm mt-2 max-w-md mx-auto">系统将会自动同步已绑定宿舍的电量数据，请确保Cookie状态正常。</p>
             </div>
+        </div>
+    </div>
+
+    <div x-show="showPowerTrend" x-cloak class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[100] p-4" @click.self="closePowerTrend()">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative">
+            <button class="absolute top-3 right-3 text-slate-400 hover:text-blue-500 text-xl" @click="closePowerTrend()"><i class="fas fa-times"></i></button>
+            <h3 class="text-lg font-bold mb-4 text-center">
+                <span x-text="powerTrendRoomLabel"></span> 近7天耗电趋势
+            </h3>
+            <div id="power-trend-chart" style="width:100%;height:320px;"></div>
+            <div class="text-center text-xs text-slate-400 mt-2">数据来源：每日统计</div>
         </div>
     </div>
 

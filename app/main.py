@@ -27,6 +27,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 os.environ['WDM_SSL_VERIFY'] = '0'
 
 # Flask应用
+from flask import Flask, render_template, jsonify, send_from_directory, request, redirect
+from api import api_bp
 app = Flask(__name__)
 # 避免浏览器缓存静态页面导致前端更新不生效
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -36,9 +38,9 @@ app.register_blueprint(api_bp)
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
 
+
 @app.route('/')
 def dashboard():
-    """管理仪表盘"""
     try:
         return render_template('dashboard.html')
     except Exception as e:
