@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿舍电费监控 - 仪表盘</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        .mobile-nav { display: none; }
+        @media (max-width: 768px) {
+            .desktop-nav { display: none; }
+            .mobile-nav { display: flex; }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen font-sans" x-data="dashboard()" x-init="init()">
+
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-gray-100 desktop-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg mr-3 shadow-blue-200 shadow-md">
+                        <i class="fas fa-bolt text-lg"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">宿舍电费监控</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="hidden sm:flex items-center bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                        <i class="far fa-clock text-indigo-400 text-xs mr-2"></i>
+                        <span class="text-xs font-mono font-bold text-indigo-600 tracking-wide" x-text="currentTime"></span>
+                    </div>
+
+                    <a href="/" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm">
+                        <i class="fas fa-home mr-2"></i>仪表盘
+                    </a>
+
+                    <a href="/config" x-show="isAdmin" class="text-gray-600 hover:bg-gray-100 px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm">
+                        <i class="fas fa-cog mr-2"></i>配置
+                    </a>
+
+                    <a href="https://dorm-electricity.pages.dev/" target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:bg-gray-100 px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm">
+                        <i class="fas fa-question-circle mr-2"></i>帮助
+                    </a>
+
+                    <button @click="isAdmin ? logout() : showAdminLogin = true" 
+                            class="ml-2 w-10 h-10 flex items-center justify-center rounded-xl transition duration-200 shadow-sm border"
+                            :class="isAdmin ? 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50 hover:text-blue-500'"
+                            :title="isAdmin ? '退出管理员' : '管理员登录'">
+                        <i class="fas" :class="isAdmin ? 'fa-user-shield' : 'fa-user-cog'"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="bg-white/90 backdrop-blur shadow-lg mobile-nav flex-col border-b border-gray-100">
+        <div class="flex justify-between items-center px-4 py-3">
+            <div class="flex items-center">
+                <div class="bg-blue-600 text-white p-1.5 rounded-lg mr-2">
+                    <i class="fas fa-bolt text-sm"></i>
+                </div>
+                <h1 class="text-lg font-bold text-gray-800">电费监控</h1>
+            </div>
+            <div class="flex items-center">
+                <button @click="isAdmin ? logout() : showAdminLogin = true" 
+                    class="mr-3 w-8 h-8 rounded-lg flex items-center justify-center border transition-colors"
+                    :class="isAdmin ? 'bg-green-50 text-green-600 border-green-200' : 'bg-white text-gray-400 border-gray-100'">
+                    <i class="fas" :class="isAdmin ? 'fa-user-shield' : 'fa-user-cog text-xs'"></i>
+                </button>
+                <div class="flex items-center bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">
+                    <span class="text-[10px] font-mono font-bold text-indigo-600 tracking-wide" x-text="currentTime"></span>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-around border-t border-gray-100 py-2">
+            <a href="/" class="text-blue-600 bg-blue-50 flex flex-col items-center flex-1 py-1 rounded-lg mx-2 transition-colors">
+                <i class="fas fa-home text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">仪表盘</span>
+            </a>
+            
+            <a href="/config" x-show="isAdmin" class="text-gray-400 flex flex-col items-center flex-1 py-1 rounded-lg mx-2 transition-colors">
+                <i class="fas fa-cog text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">配置</span>
+            </a>
+
+            <a href="https://dorm-electricity.pages.dev/" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center flex-1 py-1 rounded-lg mx-2 text-gray-400">
+                <i class="fas fa-question-circle text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">帮助</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6 transition hover:shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">登录状态</p>
+                        <h3 class="text-xl sm:text-2xl font-bold" :class="getLoginSummaryTextClass()">
+                            <span x-text="getLoginTitleText()"></span>
+                        </h3>
+                    </div>
+                    <div :class="getLoginSummaryIconClass()" class="rounded-xl p-3 shadow-inner">
+                        <i class="fas fa-key text-xl"></i>
+                    </div>
+                </div>
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5">
+                        <div class="text-sm text-slate-700 flex items-center gap-2 min-w-0">
+                            <span class="inline-flex items-center gap-2 min-w-0">
+                                <span class="w-2.5 h-2.5 rounded-full" :class="getLoginConnectedCount() >= getDisplayAuthSources().length ? 'bg-emerald-500' : (getLoginConnectedCount() > 0 ? 'bg-amber-500' : 'bg-rose-500')"></span>
+                                <span class="truncate" x-text="getLoginSummaryText()"></span>
+                            </span>
+                            <span class="text-xs text-slate-400 shrink-0" x-text="'(共 ' + getDisplayAuthSources().length + ' 个)'"></span>
+                        </div>
+
+                        <button type="button" @click="showAuthSourcesModal = true"
+                                class="text-xs font-semibold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-3 py-2 rounded-lg transition">
+                            <i class="fas fa-list mr-1"></i>查看
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6 transition hover:shadow-md relative overflow-hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">监控服务</p>
+                        <h3 class="text-xl sm:text-2xl font-bold flex items-center gap-2" :class="status.is_monitoring ? 'text-emerald-600' : 'text-slate-500'">
+                            <span class="relative flex h-3 w-3" x-show="status.is_monitoring">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                            </span>
+                            <span x-text="status.is_monitoring ? '运行中' : '已暂停'"></span>
+                        </h3>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button x-show="isAdmin" @click="toggleMonitoring()" 
+                                class="text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl transition border border-blue-100">
+                            <i class="fas mr-1.5" :class="status.is_monitoring ? 'fa-pause' : 'fa-play'"></i>
+                            <span x-text="status.is_monitoring ? '暂停监控' : '恢复监控'"></span>
+                        </button>
+                        <div class="bg-indigo-50 text-indigo-500 rounded-xl p-3">
+                            <i class="fas fa-heartbeat text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 bg-slate-50 rounded-lg p-3 border border-slate-100">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-500"><i class="fas fa-history mr-1"></i>检测间隔</span>
+                        <span class="font-mono font-medium text-slate-700" x-text="Math.floor(status.interval / 60) + ' min'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6 sm:col-span-2 lg:col-span-1 transition hover:shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-1">
+                        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">最近更新</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-800">
+                            <span x-text="status.last_check_time || '尚未开始'"></span>
+                        </h3>
+                    </div>
+                    <div class="bg-orange-50 text-orange-500 rounded-xl p-3">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between text-sm bg-slate-50 p-2.5 rounded-lg">
+                        <span class="text-slate-500">下一次运行</span>
+                        <span class="font-mono font-bold text-blue-600" x-text="Math.floor(status.next_check_in / 60) + ' min'"></span>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 rounded-full animate-pulse" style="width: 60%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="status.last_error" class="bg-rose-50 border-l-4 border-rose-500 p-4 mb-6 rounded-r-lg shadow-sm animate-pulse-once">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-rose-500 mt-0.5 text-lg"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-sm font-medium text-rose-800">系统遇到问题</h3>
+                    <div class="mt-1 text-sm text-rose-700" x-text="status.last_error"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <template x-for="room in status.rooms" :key="room.room">
+                <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:-translate-y-1 overflow-hidden group">
+                    <div class="px-5 pt-5 pb-3 border-b border-gray-50 flex justify-between items-center bg-gradient-to-r from-white to-slate-50">
+                        <h3 class="text-lg font-bold text-slate-700 flex items-center">
+                            <i class="fas fa-door-closed text-slate-400 mr-2"></i>
+                            <span x-text="room.room"></span>
+                        </h3>
+                        <button class="text-slate-300 hover:text-blue-500 transition">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                    <div class="p-5">
+                        <div class="mb-4">
+                            <p class="text-sm text-slate-500 mb-1 flex items-center">
+                                <i class="fas fa-bolt text-yellow-500 mr-1.5"></i>剩余电量
+                            </p>
+                            <div class="flex items-baseline">
+                                <span class="text-4xl font-bold tracking-tight" :class="parseFloat(room.kwh) < config.threshold ? 'text-rose-500' : 'text-slate-800'" x-text="room.kwh"></span>
+                                <span class="ml-1 text-slate-500 text-sm font-medium">度</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-3 flex items-center justify-between border border-slate-100 group-hover:border-blue-100 transition-colors">
+                            <div class="flex items-center text-sm text-slate-600">
+                                <i class="fas fa-coins text-yellow-500 mr-2"></i>
+                                <span>账户余额</span>
+                            </div>
+                            <span class="text-lg font-semibold text-slate-700 font-mono" x-text="room.money + ' 元'"></span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <div x-show="!status.rooms || status.rooms.length === 0" class="col-span-full bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 p-10 text-center hover:bg-slate-100 transition cursor-pointer">
+                <div class="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <i class="fas fa-plug text-slate-300 text-4xl"></i>
+                </div>
+                <p class="text-slate-600 text-lg font-medium">暂无房间数据</p>
+                <p class="text-slate-400 text-sm mt-2 max-w-md mx-auto">系统将会自动同步已绑定宿舍的电量数据，请确保Cookie状态正常。</p>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showAdminLogin" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showAdminLogin = false">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 class="text-xl font-bold mb-4 text-center">🔐 管理员登录</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Access Token</label>
+                    <input type="password" x-model="adminInputToken"
+                           @keyup.enter="loginAdmin()"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+                <button @click="loginAdmin()"
+                        class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition font-medium">
+                    验证
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showSetup" x-cloak class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div class="text-center mb-6">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-blue-500 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">系统初始化</h3>
+                <p class="text-gray-600 mt-2">为了安全，请设置一个管理员Token</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">设置新 Token</label>
+                    <input type="text" x-model="newAdminToken"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center font-mono text-lg"
+                           placeholder="建议使用复杂字符串">
+                    <p class="text-xs text-gray-500 mt-2 text-center">请务必牢记，此Token保存在 config.ini 中</p>
+                </div>
+                <button @click="setupAdmin()"
+                        :disabled="!newAdminToken || newAdminToken.length < 6"
+                        class="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white px-4 py-3 rounded-lg transition font-bold shadow-lg">
+                    完成设置并进入
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showManualCookie" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" @click.self="closeManualCookie()">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-bold mb-4">手动输入Cookie</h3>
+            <label class="block text-sm text-slate-600 mb-2">账号</label>
+            <div x-show="manualCookieSourceLocked" class="w-full px-3 py-2 border border-gray-200 rounded-lg mb-4 bg-slate-50 text-slate-700">
+                <span class="font-semibold" x-text="getAuthSourceLabel(manualCookie.source)"></span>
+                <span class="text-xs text-slate-500 ml-2" x-text="'(' + manualCookie.source + ')'"></span>
+            </div>
+            <select x-show="!manualCookieSourceLocked" x-model="manualCookie.source" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4">
+                <template x-for="src in getDisplayAuthSources()" :key="src">
+                    <option :value="src" x-text="getAuthSourceLabel(src) + ' (' + src + ')' "></option>
+                </template>
+            </select>
+            <input type="text" x-model="manualCookie.cookie" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4"
+                   placeholder="JSESSIONID=...">
+            <button @click="submitManualCookie()" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg">保存</button>
+        </div>
+    </div>
+
+    <div x-show="showAuthSourcesModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showAuthSourcesModal = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">宿舍账号</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">点击对应账号打开二维码登录；列表支持滚动。</p>
+                </div>
+                <button type="button" class="w-9 h-9 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500" @click="showAuthSourcesModal = false">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="px-5 py-4">
+                <div x-show="isLoginBusy()" class="mb-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-3 py-2 text-sm">
+                    <i class="fas fa-lock mr-2"></i>
+                    <span>当前正在扫码：</span>
+                    <span class="font-semibold" x-text="loginState && loginState.source ? getAuthSourceLabel(loginState.source) : '未知'"></span>
+                    <span class="text-xs ml-2">（一次只能扫一个）</span>
+                </div>
+
+                <div class="max-h-[60vh] overflow-auto pr-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <template x-for="src in getDisplayAuthSources()" :key="src">
+                            <div class="border rounded-xl p-3" 
+                                 :class="isAuthSourceConnected(src) ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white'">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2.5 h-2.5 rounded-full" :class="isAuthSourceConnected(src) ? 'bg-emerald-500' : 'bg-slate-300'"></span>
+                                            <div class="font-semibold text-slate-800 truncate" x-text="getAuthSourceLabel(src)"></div>
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-1" x-text="'source: ' + src"></div>
+                                    </div>
+
+                                    <div class="shrink-0 flex items-center gap-2">
+                                        <button type="button" @click="openManualCookieForSource(src)"
+                                            class="px-3 py-2 rounded-xl text-xs font-semibold transition border bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+                                            :disabled="false"
+                                            :title="'为 ' + getAuthSourceLabel(src) + ' 手动输入 Cookie'">
+                                            <i class="fas fa-keyboard mr-1"></i>
+                                            <span>手动</span>
+                                        </button>
+
+                                        <a :href="getLoginHref(src)" target="_blank"
+                                           @click="handleLoginClick($event, src)"
+                                           :aria-disabled="isLoginLockedForSource(src) ? 'true' : 'false'"
+                                           :title="getLoginButtonTitle(src)"
+                                           class="px-3 py-2 rounded-xl text-xs font-semibold transition border"
+                                           :class="isLoginLockedForSource(src) 
+                                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' 
+                                                : (isAuthSourceConnected(src) 
+                                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600' 
+                                                    : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600')">
+                                            <i class="fas mr-1" :class="isLoginLockedForSource(src) ? 'fa-lock' : (isAuthSourceConnected(src) ? 'fa-redo' : 'fa-qrcode')"></i>
+                                            <span x-text="isAuthSourceConnected(src) ? '重新扫码' : '扫码登录'"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
+                <div class="text-xs text-slate-400">提示：每个账号右侧支持“手动”或“扫码”。</div>
+                <button type="button" class="text-sm font-semibold bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl" @click="showAuthSourcesModal = false">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="toast.show" x-transition class="fixed bottom-8 right-8 text-white px-6 py-4 rounded-lg shadow-lg z-50"
+        :class="toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'">
+        <span x-text="toast.message"></span>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
